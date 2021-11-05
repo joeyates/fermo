@@ -29,7 +29,7 @@ defmodule Fermo.Assets do
 
   def live_asset_path(filename) do
     manifest_path = Webpack.Assets.path!(filename)
-    "//localhost:#{@webpack_dev_server_port}/#{manifest_path}"
+    Path.join("//localhost:#{@webpack_dev_server_port}", manifest_path)
   end
 
   # TODO: make this a context aware macro
