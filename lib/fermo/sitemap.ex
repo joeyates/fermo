@@ -30,6 +30,7 @@ defmodule Fermo.Sitemap do
   def build(%{sitemap: sitemap} = config) do
     root = config.base_url
     build_path = config[:build_path] || "build"
+    Fermo.File.ensure_path(build_path)
     sitemap_pathname = build_path <> "/sitemap.xml"
     datetime = DateTime.utc_now()
     lastmod = DateTime.to_iso8601(datetime, :extended)
