@@ -25,14 +25,13 @@ defmodule Fermo.Live.App do
 
     app_module = Mix.Fermo.Module.module!()
 
-    children = app_live_mode_servers() ++ [
+    children = live_mode_servers() ++ [
       cowboy,
       {Watcher, dirs: ["lib", "priv/source"]},
       {ChangeHandler, []},
       {Dependencies, [app_module: app_module]},
-      {SocketRegistry, []},
-      {Webpack.DevServer, []}
-    ]
+      {SocketRegistry, []}
+    ] ++ live_mode_assets()
 
     {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one)
 
@@ -61,8 +60,15 @@ defmodule Fermo.Live.App do
     ]
   end
 
+  defp live_mode_assets() do
+    case Application.fetch_env(:fermo, :live_mode_assets) do
+      :error -> [{Webpack.DevServer, []}]
+      {:ok, spec} -> spec
+    end
+  end
+
   # Allow projects to add children
-  defp app_live_mode_servers() do
+  defp live_mode_servers() do
     case Application.fetch_env(:fermo, :live_mode_servers) do
       :error -> []
       {:ok, servers} -> servers
