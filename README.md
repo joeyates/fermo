@@ -88,7 +88,7 @@ defmodule MyProject.MixProject do
 
   defp deps do
     [
-      {:fermo, "~> 0.16.2"}
+      {:fermo, "~> 0.16.3"}
     ]
   end
 end
