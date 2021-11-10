@@ -8,7 +8,7 @@ defmodule Webpack.Assets do
   in order to provide asset name mapping.
   """
 
-  @webpack_config_path "webpack.config.js"
+  @webpack_config_path_default "webpack.config.js"
 
   def start_link(_args) do
     GenServer.start_link(__MODULE__, %{}, name: :assets)
@@ -19,7 +19,7 @@ defmodule Webpack.Assets do
   end
 
   def build() do
-    if File.exists?(@webpack_config_path) do
+    if File.exists?(webpack_config_path()) do
       System.cmd("yarn", ["run", "webpack"]) |> handle_build_result()
     else
       {:ok}
@@ -42,6 +42,14 @@ defmodule Webpack.Assets do
     )
     GenServer.call(:assets, {:put, manifest})
     {:ok}
+  end
+
+  def webpack_config_path do
+    Application.get_env(
+      :fermo,
+      :webpack_config_path,
+      @webpack_config_path_default
+    )
   end
 
   defp handle_build_result({_output, 0}) do

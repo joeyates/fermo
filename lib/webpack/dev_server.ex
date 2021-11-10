@@ -5,7 +5,6 @@ defmodule Webpack.DevServer do
   Runs the Webpack Development server for live mode.
   """
 
-  @webpack_config_path "webpack.config.js"
   @webpack_dev_server_command_default "yarn run webpack serve --watch-options-stdin"
   @webpack_dev_server_command Application.get_env(
     :fermo,
@@ -14,7 +13,7 @@ defmodule Webpack.DevServer do
   )
 
   def start_link(_opts) do
-    if File.exists?(@webpack_config_path) do
+    if File.exists?(Webpack.Assets.webpack_config_path()) do
       {:ok, _pid} = GenServer.start_link(__MODULE__, %{}, name: :webpack_dev_server)
     else
       {:error, :webpack_config_not_found}
