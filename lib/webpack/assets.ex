@@ -31,13 +31,14 @@ defmodule Webpack.Assets do
     |> File.read!
     |> Jason.decode!
     |> Enum.into(
-      # Ensure initial '/' on all assets in the manifest
+      # Ensure asset names have no initial '/', while
+      # asset paths do
       %{},
       fn
-        {"/" <> k, "/" <> v} -> {"/" <> k, "/" <> v}
-        {"/" <> k,        v} -> {"/" <> k, "/" <> v}
-        {       k, "/" <> v} -> {"/" <> k, "/" <> v}
-        {       k,        v} -> {"/" <> k, "/" <> v}
+        {"/" <> k, "/" <> v} -> {k, "/" <> v}
+        {"/" <> k,        v} -> {k, "/" <> v}
+        {       k, "/" <> v} -> {k, "/" <> v}
+        {       k,        v} -> {k, "/" <> v}
       end
     )
     GenServer.call(:assets, {:put, manifest})
@@ -64,10 +65,10 @@ defmodule Webpack.Assets do
   end
 
   def path("/" <> name) do
-    GenServer.call(:assets, {:path, "/" <> name})
+    GenServer.call(:assets, {:path, name})
   end
   def path(name) do
-    GenServer.call(:assets, {:path, "/" <> name})
+    GenServer.call(:assets, {:path, name})
   end
 
   def path!(name) do
