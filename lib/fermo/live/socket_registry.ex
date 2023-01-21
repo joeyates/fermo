@@ -24,6 +24,9 @@ defmodule Fermo.Live.SocketRegistry do
     GenServer.call(@name, {:subscribed})
   end
 
+  def subscribed(nil) do
+    GenServer.call(@name, {:subscribed})
+  end
   def subscribed(paths) when is_list(paths) do
     Enum.map(paths, &(subscribed(&1)))
     |> List.flatten()
@@ -33,14 +36,6 @@ defmodule Fermo.Live.SocketRegistry do
   end
   def subscribed(%Regex{} = path) do
     GenServer.call(@name, {:subscribed, path})
-  end
-
-  def reload_all() do
-    subscribed()
-    |> Enum.each(fn pid ->
-      send(pid, {:reload})
-    end)
-    {:ok}
   end
 
   def reload(path) do
