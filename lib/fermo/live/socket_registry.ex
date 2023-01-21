@@ -38,7 +38,7 @@ defmodule Fermo.Live.SocketRegistry do
     GenServer.call(@name, {:subscribed, path})
   end
 
-  def reload(path) do
+  def reload(path \\ nil) do
     subscribed(path)
     |> Enum.each(fn pid ->
       send(pid, {:reload})

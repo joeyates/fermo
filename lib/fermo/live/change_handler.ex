@@ -71,6 +71,6 @@ defmodule Fermo.Live.ChangeHandler do
   end
 
   defp notify_lib_change() do
-    {:ok} = Fermo.Live.SocketRegistry.reload_all()
+    {:ok} = Fermo.Live.SocketRegistry.reload()
   end
 end
