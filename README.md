@@ -9,19 +9,26 @@ A static site generator, build for speed and flexibility.
 Install the project generator:
 
 ```sh
-$ mix archive.install hex fermo_new
+mix archive.install hex fermo_new
 ```
 
 Generate the project:
 
 ```sh
-$ mix fermo.new PATH
+mix fermo.new PATH
+```
+
+Install dependencies:
+
+```sh
+mix deps.get
+yarn install
 ```
 
 Build the project:
 
 ```sh
-$ mix fermo.build
+mix fermo.build
 ```
 
 # Live Dev Mode
@@ -29,7 +36,7 @@ $ mix fermo.build
 Have pages reloaded when structure, style or content change.
 
 ```sh
-$ mix fermo.live
+mix fermo.live
 ```
 
 The live site is available at http://localhost:4001/
