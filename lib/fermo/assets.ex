@@ -1,5 +1,9 @@
 defmodule Fermo.Assets do
-  @webpack_dev_server_port 8080
+  @live_asset_host Application.compile_env(
+    :fermo,
+    :live_asset_host,
+    "//localhost:8080"
+  )
 
   def start_link(args \\ []) do
     Webpack.Assets.start_link(args)
@@ -29,7 +33,7 @@ defmodule Fermo.Assets do
 
   def live_asset_path(filename) do
     manifest_path = Webpack.Assets.path!(filename)
-    Path.join("//localhost:#{@webpack_dev_server_port}", manifest_path)
+    Path.join(@live_asset_host, manifest_path)
   end
 
   # TODO: make this a context aware macro
