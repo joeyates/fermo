@@ -9,13 +9,11 @@ defmodule Fermo.Build do
 
   @callback run(map()) :: {:ok, map()}
   def run(config) do
-    # TODO: check if Webpack assets are ready before building HTML
     config =
       config
       |> Map.put_new(:stats, %{})
       |> put_in([:stats, :build_started], Time.utc_now)
 
-    {:ok} = Fermo.Assets.build()
     {:ok} = Fermo.I18n.load()
 
     config =

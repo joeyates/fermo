@@ -44,7 +44,7 @@ defmodule Fermo.MixProject do
   def application do
     [
       extra_applications: extra_applications(Mix.env()),
-      mod: {Fermo, []}
+      mod: {Fermo.App, []}
     ]
   end
 

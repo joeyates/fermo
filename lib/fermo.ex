@@ -6,12 +6,6 @@ defmodule Fermo do
   @build Application.compile_env(:fermo, :build, Fermo.Build)
   @pagination Application.compile_env(:fermo, :pagination, Fermo.Pagination)
 
-  def start(_start_type, _args \\ []) do
-    {:ok, _pid} = Fermo.Assets.start_link()
-    {:ok, _pid} = I18n.start_link()
-    {:ok, self()}
-  end
-
   @doc false
   defmacro __using__(opts \\ %{}) do
     quote do
@@ -21,7 +15,6 @@ defmodule Fermo do
       Module.register_attribute __MODULE__, :config, persist: true
       @config unquote(opts)
 
-      import Fermo.Assets
       import I18n
     end
   end

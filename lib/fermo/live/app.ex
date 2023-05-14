@@ -39,7 +39,6 @@ defmodule Fermo.Live.App do
   end
 
   def stop(_state) do
-    Application.stop(:webpack_dev_server)
     Application.stop(:cowboy)
     Application.stop(:telemetry)
   end
@@ -62,7 +61,7 @@ defmodule Fermo.Live.App do
 
   defp live_mode_assets() do
     case Application.fetch_env(:fermo, :live_mode_assets) do
-      :error -> [{Webpack.DevServer, []}]
+      :error -> []
       {:ok, spec} -> spec
     end
   end
