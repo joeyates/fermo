@@ -3,9 +3,9 @@ defmodule Fermo.Build do
 
   import Mix.Fermo.Paths, only: [source_path: 0]
 
-  @config Application.get_env(:fermo, :config, Fermo.Config)
-  @ffile Application.get_env(:fermo, :ffile, Fermo.File)
-  @sitemap Application.get_env(:fermo, :sitemap, Fermo.Sitemap)
+  @config Application.compile_env(:fermo, :config, Fermo.Config)
+  @ffile Application.compile_env(:fermo, :ffile, Fermo.File)
+  @sitemap Application.compile_env(:fermo, :sitemap, Fermo.Sitemap)
 
   @callback run(map()) :: {:ok, map()}
   def run(config) do

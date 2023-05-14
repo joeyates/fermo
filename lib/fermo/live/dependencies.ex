@@ -5,8 +5,8 @@ defmodule Fermo.Live.Dependencies do
 
   @name :fermo_dependencies
 
-  @config Application.get_env(:fermo, :config, Fermo.Config)
-  @i18n Application.get_env(:fermo, :i18n, Fermo.I18n)
+  @config Application.compile_env(:fermo, :config, Fermo.Config)
+  @i18n Application.compile_env(:fermo, :i18n, Fermo.I18n)
 
   def init(app_module: app_module) do
     {:ok} = @i18n.load()

@@ -1,6 +1,6 @@
 defmodule Fermo.Compilers do
-  @compilers_slim Application.get_env(:fermo, :compilers_slim, Fermo.Compilers.Slim)
-  @mix_utils Application.get_env(:fermo, :mix_utils, Mix.Utils)
+  @compilers_slim Application.compile_env(:fermo, :compilers_slim, Fermo.Compilers.Slim)
+  @mix_utils Application.compile_env(:fermo, :mix_utils, Mix.Utils)
 
   @default_compilers [
     eex: Fermo.Compilers.EEx,

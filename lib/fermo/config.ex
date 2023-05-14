@@ -1,10 +1,10 @@
 defmodule Fermo.Config do
   @moduledoc false
 
-  @i18n Application.get_env(:fermo, :i18n, Fermo.I18n)
-  @localizable Application.get_env(:fermo, :localizable, Fermo.Localizable)
-  @simple Application.get_env(:fermo, :simple, Fermo.Simple)
-  @template Application.get_env(:fermo, :template, Fermo.Template)
+  @i18n Application.compile_env(:fermo, :i18n, Fermo.I18n)
+  @localizable Application.compile_env(:fermo, :localizable, Fermo.Localizable)
+  @simple Application.compile_env(:fermo, :simple, Fermo.Simple)
+  @template Application.compile_env(:fermo, :template, Fermo.Template)
 
   def initial(config) do
     build_path = config[:build_path] || "build"

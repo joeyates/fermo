@@ -11,7 +11,7 @@ defmodule Fermo.Compilers.EEx do
     :offset
   ]
 
-  @file_impl Application.get_env(:fermo, :file_impl, File)
+  @file_impl Application.compile_env(:fermo, :file_impl, File)
 
   def compile(template_project_path) do
     template_source_path = absolute_to_source(template_project_path)

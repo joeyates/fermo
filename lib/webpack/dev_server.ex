@@ -6,7 +6,7 @@ defmodule Webpack.DevServer do
   """
 
   @webpack_dev_server_command_default "yarn run webpack serve --watch-options-stdin"
-  @webpack_dev_server_command Application.get_env(
+  @webpack_dev_server_command Application.compile_env(
     :fermo,
     :webpack_dev_server_command,
     @webpack_dev_server_command_default

@@ -6,10 +6,10 @@ defmodule Mix.Fermo.Compiler do
   import Mix.Fermo.Paths, only: [full_source_path: 0]
 
   # Implementations for testing
-  @compilers Application.get_env(:fermo, :compilers, Fermo.Compilers)
-  @file_impl Application.get_env(:fermo, :file_impl, File)
-  @mix_compiler_manifest Application.get_env(:fermo, :mix_compiler_manifest, Mix.Fermo.Compiler.Manifest)
-  @mix_utils Application.get_env(:fermo, :mix_utils, Mix.Utils)
+  @compilers Application.compile_env(:fermo, :compilers, Fermo.Compilers)
+  @file_impl Application.compile_env(:fermo, :file_impl, File)
+  @mix_compiler_manifest Application.compile_env(:fermo, :mix_compiler_manifest, Mix.Fermo.Compiler.Manifest)
+  @mix_utils Application.compile_env(:fermo, :mix_utils, Mix.Utils)
 
   def run do
     :yamerl_app.set_param(:node_mods, [])

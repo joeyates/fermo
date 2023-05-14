@@ -3,8 +3,8 @@ defmodule Fermo do
   Fermo provides the main entry points for configuring a project
   """
 
-  @build Application.get_env(:fermo, :build, Fermo.Build)
-  @pagination Application.get_env(:fermo, :pagination, Fermo.Pagination)
+  @build Application.compile_env(:fermo, :build, Fermo.Build)
+  @pagination Application.compile_env(:fermo, :pagination, Fermo.Pagination)
 
   def start(_start_type, _args \\ []) do
     {:ok, _pid} = Fermo.Assets.start_link()
