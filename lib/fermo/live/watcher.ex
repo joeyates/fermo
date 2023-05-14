@@ -5,10 +5,6 @@ defmodule Fermo.Live.Watcher do
   use GenServer
   require Logger
 
-  def init(_opts) do
-    {:ok, %{}}
-  end
-
   def start_link(opts) do
     opts = [
       name: @monitor_name,
@@ -25,6 +21,11 @@ defmodule Fermo.Live.Watcher do
         """
         other
     end
+  end
+
+  @impl true
+  def init(_opts) do
+    {:ok, %{}}
   end
 
   def monitor_name do

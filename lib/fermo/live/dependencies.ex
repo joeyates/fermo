@@ -8,14 +8,15 @@ defmodule Fermo.Live.Dependencies do
   @config Application.compile_env(:fermo, :config, Fermo.Config)
   @i18n Application.compile_env(:fermo, :i18n, Fermo.I18n)
 
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts, name: @name)
+  end
+
+  @impl true
   def init(app_module: app_module) do
     {:ok} = @i18n.load()
     config = load_config(app_module)
     {:ok, %{config: config, app_module: app_module}}
-  end
-
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: @name)
   end
 
   def reinitialize() do
@@ -38,6 +39,7 @@ defmodule Fermo.Live.Dependencies do
     GenServer.call(@name, {:add_page_dependency, path, type, value})
   end
 
+  @impl true
   def handle_call({:reinitialize}, _from, %{app_module: app_module} = state) do
     config = load_config(app_module)
     {:reply, {:ok}, Map.put(state, :config, config)}
