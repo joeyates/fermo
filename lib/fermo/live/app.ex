@@ -6,9 +6,11 @@ defmodule Fermo.Live.App do
   alias Fermo.Live.{
     AssetPipeline,
     Dependencies,
+    LibChangeHandler,
     Server,
     Socket,
     SocketRegistry,
+    TemplateChangeHandler,
     Watcher
   }
 

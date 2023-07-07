@@ -1,12 +1,10 @@
 defmodule Fermo.Live.LibChangeHandler do
   @moduledoc false
 
-  def notify({:file_event, _pid, {_path, event}}) do
-    if :modified in event do
-      Mix.Tasks.Compile.Elixir.run([])
-      recompile_templates()
-      notify_lib_change()
-    end
+  def notify(_path) do
+    Mix.Tasks.Compile.Elixir.run([])
+    recompile_templates()
+    notify_lib_change()
   end
 
   defp recompile_templates() do

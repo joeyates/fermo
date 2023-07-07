@@ -4,13 +4,11 @@ defmodule Fermo.Live.TemplateChangeHandler do
   alias Fermo.Live.{Dependencies, SocketRegistry}
   alias Mix.Fermo.{Compiler, Paths}
 
-  def notify({:file_event, _pid, {path, event}}) do
-    if :modified in event do
-      recompile_templates()
-      app_relative_path = Paths.app_relative_path(path)
-      template_relative_path(app_relative_path)
-      |> notify_template_change()
-    end
+  def notify(path) do
+    recompile_templates()
+    app_relative_path = Paths.app_relative_path(path)
+    template_relative_path(app_relative_path)
+    |> notify_template_change()
   end
 
   defp recompile_templates() do

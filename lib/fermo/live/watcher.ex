@@ -77,7 +77,7 @@ defmodule Fermo.Live.Watcher do
 
   def dispatch_notify(path, %{notify: module}) do
     Logger.debug "Fermo.Live.Watcher notifying #{module} of change to file '#{path}'"
-    apply(module, :notify, path)
+    apply(module, :notify, [path])
   end
 
   def dispatch_notify(_path, _state), do: {:ok}
