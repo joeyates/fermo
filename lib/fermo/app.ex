@@ -7,7 +7,7 @@ defmodule Fermo.App do
 
   def start(_start_type, _args \\ []) do
     Logger.info "Starting Fermo.App"
-    children = [{I18n, []}]
+    children = [{I18n, []}, {Fermo.Assets, %{}}]
 
     {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one)
 
