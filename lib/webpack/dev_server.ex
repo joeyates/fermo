@@ -21,7 +21,7 @@ defmodule Webpack.DevServer do
   end
 
   def init(_args) do
-    IO.puts "Starting Webpack dev server..."
+    IO.puts "Webpack.DevServer starting..."
     port = Port.open(
       {:spawn, @webpack_dev_server_command},
       [:binary, :exit_status, {:env, [{'NODE_ENV', 'development'}]}]
@@ -32,7 +32,7 @@ defmodule Webpack.DevServer do
 
   def handle_info({_port, {:data, message}}, state) do
     if String.match?(message, ~r/manifest.json\s.*?\[emitted\]/) do
-      IO.puts "manifest emitted!"
+      IO.puts "Webpack asset manifest emitted!"
       {:ok} = Webpack.Assets.load_manifest()
     end
     {:noreply, state}

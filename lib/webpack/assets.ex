@@ -1,6 +1,4 @@
 defmodule Webpack.Assets do
-  use GenServer
-
   @moduledoc """
   Handles an external (Webpack) pipeline.
 
@@ -9,14 +7,6 @@ defmodule Webpack.Assets do
   """
 
   @webpack_config_path_default "webpack.config.js"
-
-  def start_link(_args) do
-    GenServer.start_link(__MODULE__, %{}, name: :assets)
-  end
-
-  def init(args) do
-    {:ok, args}
-  end
 
   def build() do
     if File.exists?(webpack_config_path()) do
@@ -58,36 +48,5 @@ defmodule Webpack.Assets do
   end
   defp handle_build_result({output, _exit_status}) do
     {:error, "External webpack pipeline failed to build\n\n#{output}"}
-  end
-
-  def manifest do
-    GenServer.call(:assets, {:manifest})
-  end
-
-  def path("/" <> name) do
-    GenServer.call(:assets, {:path, name})
-  end
-  def path(name) do
-    GenServer.call(:assets, {:path, name})
-  end
-
-  def path!(name) do
-    {:ok, path} = path(name)
-    path
-  end
-
-  def handle_call({:put, state}, _from, _state) do
-    {:reply, {:ok}, state}
-  end
-  def handle_call({:manifest}, _from, state) do
-    {:reply, {:ok, state}, state}
-  end
-  def handle_call({:path, name}, _from, state) do
-    if Map.has_key?(state, name) do
-      path = state[name]
-      {:reply, {:ok, path}, state}
-    else
-      {:reply, {:error, "'#{name}' not found in manifest"}, state}
-    end
   end
 end
