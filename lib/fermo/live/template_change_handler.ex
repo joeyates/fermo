@@ -26,11 +26,8 @@ defmodule Fermo.Live.TemplateChangeHandler do
     end
   end
 
-  defp notify_template_change(template_relative_path) do
-    {:ok, pages} = Dependencies.pages_by_dependency(
-      :template,
-      template_relative_path
-    )
+  defp notify_template_change(relative_path) do
+    {:ok, pages} = Dependencies.pages_by_dependency(relative_path)
     Enum.each(pages, fn page ->
       {:ok} = SocketRegistry.reload(page.path)
     end)
