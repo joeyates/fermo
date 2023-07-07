@@ -1,5 +1,12 @@
 defmodule Fermo.Build do
-  @moduledoc false
+  @moduledoc """
+  Handles building the static site.
+
+  By default, the site is built in the './build' directory.
+
+  This path can be overridden via the `:build_path`
+  setting in `config`.
+  """
 
   import Mix.Fermo.Paths, only: [source_path: 0]
 
