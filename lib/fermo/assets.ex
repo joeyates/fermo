@@ -269,6 +269,17 @@ defmodule Fermo.Assets do
     live_asset_path("/#{name}.js")
   end
 
+  defmacro stylesheet_path(name) do
+    quote do
+      context = var!(context)
+      if context[:page][:live] do
+        live_stylesheet_path(unquote(name))
+      else
+        static_stylesheet_path(unquote(name))
+      end
+    end
+  end
+
   defmacro stylesheet_link_tag(name) do
     quote do
       context = var!(context)
