@@ -25,13 +25,15 @@ defmodule Fermo.Live.App do
 
     app_module = Mix.Fermo.Module.module!()
 
-    children = live_mode_servers() ++ [
-      cowboy,
-      {Watcher, dirs: ["lib", "priv/source", "build"]}, # TODO
-      {ChangeHandler, []},
-      {Dependencies, [app_module: app_module]},
-      {SocketRegistry, []}
-    ] ++ live_mode_assets()
+    children =
+      live_mode_servers() ++
+      [
+        cowboy,
+        {Dependencies, [app_module: app_module]},
+        {SocketRegistry, []}
+      ] ++
+      live_watchers() ++
+      live_asset_pipelines()
 
     {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one)
 
@@ -64,6 +66,14 @@ defmodule Fermo.Live.App do
       :error -> []
       {:ok, spec} -> spec
     end
+  end
+
+  defp live_watchers() do
+    [
+      [dir: "lib", notify: LibChangeHandler],
+      [dir: "priv/source", notify: TemplateChangeHandler],
+    ] ++ Application.get_env(:fermo, :live_watchers, [])
+    |> Enum.map(&{Watcher, &1})
   end
 
   # Allow projects to add children
