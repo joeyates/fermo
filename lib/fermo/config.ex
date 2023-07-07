@@ -44,6 +44,12 @@ defmodule Fermo.Config do
     put_in(config, [:pages], pages ++ [page])
   end
 
+  @doc """
+  Indicate that a file should be simply copied to the build,
+  without any transformation.
+
+  You can also add statics via the `:statics` attribute in `config`.
+  """
   def add_static(config, source, filename) do
     statics = Map.get(config, :statics)
     put_in(config, [:statics], statics ++ [%{source: source, filename: filename}])
