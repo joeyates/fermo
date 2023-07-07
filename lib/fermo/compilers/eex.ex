@@ -8,6 +8,7 @@ defmodule Fermo.Compilers.EEx do
     :frontmatter,
     :content_fors,
     :template_project_path,
+    :template_source_path,
     :offset
   ]
 
@@ -26,6 +27,7 @@ defmodule Fermo.Compilers.EEx do
         frontmatter: frontmatter,
         content_fors: [],
         template_project_path: template_project_path,
+        template_source_path: template_source_path,
         offset: 0
       }
     )
@@ -61,14 +63,15 @@ defmodule Fermo.Compilers.EEx do
         name: module.name,
         offset: module.offset,
         source: module.source,
-        template_path: module.template_project_path
+        template_project_path: module.template_project_path,
+        template_source_path: module.template_source_path
       ],
       file: module.template_project_path
     ) do
-      compiled = EEx.compile_string(source, line: offset, file: template_path)
+      compiled = EEx.compile_string(source, line: offset, file: template_project_path)
 
       cfs_compiled = Enum.map(content_fors, fn [key, eex, offset] ->
-        cf_compiled = EEx.compile_string(eex, line: offset, file: template_path)
+        cf_compiled = EEx.compile_string(eex, line: offset, file: template_project_path)
         {key, cf_compiled}
       end)
 
@@ -100,7 +103,7 @@ defmodule Fermo.Compilers.EEx do
         end
 
         def template_source_path() do
-          unquote(template_path)
+          unquote(template_source_path)
         end
 
         # Define a method with the frontmatter, so we can merge with
