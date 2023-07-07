@@ -1,16 +1,146 @@
 defmodule Fermo.Assets do
-  @live_asset_host Application.compile_env(
-    :fermo,
-    :live_asset_host,
-    "//localhost:8080"
-  )
+  @moduledoc """
+  Loads the asset manifest and provides helpers to build
+  paths to the assets.
+  """
 
-  def start_link(args \\ []) do
-    Webpack.Assets.start_link(args)
+  use GenServer
+
+  @asset_path Application.compile_env(
+    :fermo,
+    :asset_path,
+    "build"
+  )
+  @asset_extensions Application.compile_env(
+    :fermo,
+    :asset_extensions,
+    ~w(.css .ico .jpg .jpeg .js .png .txt)
+  )
+  @digested_filename ~r(-[a-z0-9]{32}\.[a-z0-9]+$)
+  @live_asset_base Application.compile_env(
+    :fermo,
+    :live_asset_base,
+    "/"
+  )
+  @name :fermo_assets
+
+  def start_link(args \\ %{}) do
+    GenServer.start_link(__MODULE__, args, name: @name)
   end
 
-  def build() do
-    Webpack.Assets.build()
+  @impl true
+  def init(args) do
+    {:ok, args}
+  end
+
+  def create_manifest() do
+    with {:ok, files} <- list_files(),
+         {:ok, metadata} <- build_metadata(files),
+         {:ok} <- copy_to_digested(metadata),
+         {:ok, manifest} <- to_manifest(metadata) do
+      GenServer.call(@name, {:put, manifest})
+      {:ok}
+    else
+      {:error, reason} ->
+        raise reason
+    end
+  end
+
+  defp list_files do
+    files =
+      @asset_path
+      |> Path.join("**")
+      |> Path.wildcard()
+      |> Enum.filter(&is_asset?/1)
+    {:ok, files}
+  end
+
+  defp is_asset?(path) do
+    with false <- File.dir?(path),
+         filename <- Path.basename(path),
+         false <- Regex.match?(@digested_filename, filename),
+         extension <- Path.extname(path),
+         true <- extension in @asset_extensions do
+      true
+    else
+      _ -> false
+    end
+  end
+
+  defp build_metadata(files) do
+    metadata =
+      files
+      |> Enum.map(fn file ->
+        relative_filename = Path.relative_to(file, @asset_path)
+        content = File.read!(file)
+        digest = Base.encode16(:erlang.md5(content), case: :lower)
+        extension = Path.extname(file)
+        root = Path.rootname(file, extension)
+        digested_filename = "#{root}-#{digest}#{extension}"
+        relative_digested_filename = Path.relative_to(digested_filename, @asset_path)
+        %{
+          filename: file,
+          relative_filename: relative_filename,
+          digest: digest,
+          digested_filename: digested_filename,
+          asset_path: "/#{relative_digested_filename}",
+          extension: extension
+        }
+      end)
+    {:ok, metadata}
+  end
+
+  defp copy_to_digested(metadata) do
+    metadata
+    |> Enum.each(fn item ->
+      File.cp!(item.filename, item.digested_filename)
+    end)
+    {:ok}
+  end
+
+  defp to_manifest(metadata) do
+    manifest =
+      metadata
+      |> Enum.map(fn item ->
+        {item.relative_filename, item}
+      end)
+      |> Enum.into(%{})
+    {:ok, manifest}
+  end
+
+  def manifest do
+    GenServer.call(@name, {:manifest})
+  end
+
+  def path("/" <> name) do
+    GenServer.call(@name, {:path, name})
+  end
+
+  def path(name) do
+    GenServer.call(@name, {:path, name})
+  end
+
+  def path!(name) do
+    {:ok, path} = path(name)
+    path
+  end
+
+  @impl true
+  def handle_call({:put, state}, _from, _state) do
+    {:reply, {:ok}, state}
+  end
+
+  def handle_call({:manifest}, _from, state) do
+    {:reply, {:ok, state}, state}
+  end
+
+  def handle_call({:path, name}, _from, state) do
+    if Map.has_key?(state, name) do
+      item = state[name]
+      {:reply, {:ok, item.asset_path}, state}
+    else
+      {:reply, {:error, "'#{name}' not found in manifest"}, state}
+    end
   end
 
   defmacro asset_path(name) do
@@ -27,13 +157,19 @@ defmodule Fermo.Assets do
   def static_asset_path("https://" <> _path = url) do
     url
   end
+
   def static_asset_path(filename) do
-    Webpack.Assets.path!(filename)
+    path!(filename)
   end
 
+  @doc """
+  If your assets pipeline has a hot reloading dev server
+  (e.g. with Webpack), set `:live_asset_base` to
+  the base URL of the webserver, e.g. '//localhost:8080'
+  """
   def live_asset_path(filename) do
-    manifest_path = Webpack.Assets.path!(filename)
-    Path.join(@live_asset_host, manifest_path)
+    manifest_path = path!(filename)
+    Path.join(@live_asset_base, manifest_path)
   end
 
   # TODO: make this a context aware macro
@@ -41,7 +177,7 @@ defmodule Fermo.Assets do
     url
   end
   def font_path(filename) do
-    Webpack.Assets.path!("/fonts/#{filename}")
+    path!("/fonts/#{filename}")
   end
 
   defmacro image_path("https://" <> _path = url) do
@@ -88,10 +224,10 @@ defmodule Fermo.Assets do
     url
   end
   def static_image_path("/" <> filename) do
-    Webpack.Assets.path!("/images/#{filename}")
+    path!("/images/#{filename}")
   end
   def static_image_path(filename) do
-    Webpack.Assets.path!("/images/#{filename}")
+    path!("/images/#{filename}")
   end
 
   def live_image_path(filename) do
@@ -125,7 +261,7 @@ defmodule Fermo.Assets do
     url
   end
   def static_javascript_path(name) do
-    Webpack.Assets.path!("/#{name}.js")
+    path!("/#{name}.js")
   end
 
   def live_javascript_path(name) do
@@ -148,7 +284,7 @@ defmodule Fermo.Assets do
     url
   end
   def static_stylesheet_path(name) do
-    Webpack.Assets.path!("/#{name}.css")
+    path!("/#{name}.css")
   end
 
   def live_stylesheet_path(name) do
