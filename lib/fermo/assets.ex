@@ -245,6 +245,7 @@ defmodule Fermo.Assets do
     end
   end
 
+  # TODO: handle user-supplied attributes, e.g. defer="true"
   defmacro javascript_include_tag(name) do
     quote do
       context = var!(context)
