@@ -4,7 +4,7 @@ defmodule Fermo.Live.App do
   use Application
 
   alias Fermo.Live.{
-    ChangeHandler,
+    AssetPipeline,
     Dependencies,
     Server,
     Socket,
