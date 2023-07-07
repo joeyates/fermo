@@ -14,7 +14,7 @@ defmodule Fermo.Build do
   @ffile Application.compile_env(:fermo, :ffile, Fermo.File)
   @sitemap Application.compile_env(:fermo, :sitemap, Fermo.Sitemap)
 
-  @assets Application.compile_env(:fermo, :assets)
+  @assets Application.compile_env(:fermo, :assets, [])
 
   @callback run(map()) :: {:ok, map()}
   def run(config) do
@@ -24,8 +24,9 @@ defmodule Fermo.Build do
       |> put_in([:stats, :build_started], Time.utc_now)
 
     {:ok} = Fermo.I18n.load()
-    if @assets do
-      @assets.build()
+    if @assets && length(@assets) > 0 do
+      Enum.each(@assets, &(&1.build()))
+      Fermo.Assets.create_manifest()
     end
 
     config =
