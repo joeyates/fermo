@@ -4,11 +4,13 @@ defmodule Fermo.Live.App do
   use Application
 
   alias Fermo.Live.{
-    ChangeHandler,
+    AssetPipeline,
     Dependencies,
+    LibChangeHandler,
     Server,
     Socket,
     SocketRegistry,
+    TemplateChangeHandler,
     Watcher
   }
 
@@ -25,14 +27,15 @@ defmodule Fermo.Live.App do
 
     app_module = Mix.Fermo.Module.module!()
 
-    children = app_live_mode_servers() ++ [
-      cowboy,
-      {Watcher, dirs: ["lib", "priv/source"]},
-      {ChangeHandler, []},
-      {Dependencies, [app_module: app_module]},
-      {SocketRegistry, []},
-      {Webpack.DevServer, []}
-    ]
+    children =
+      live_mode_servers() ++
+      [
+        cowboy,
+        {Dependencies, [app_module: app_module]},
+        {SocketRegistry, []}
+      ] ++
+      live_watchers() ++
+      live_asset_pipelines()
 
     {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one)
 
@@ -40,7 +43,6 @@ defmodule Fermo.Live.App do
   end
 
   def stop(_state) do
-    Application.stop(:webpack_dev_server)
     Application.stop(:cowboy)
     Application.stop(:telemetry)
   end
@@ -61,11 +63,21 @@ defmodule Fermo.Live.App do
     ]
   end
 
+  defp live_asset_pipelines() do
+    Application.get_env(:fermo, :live_asset_pipelines, [])
+    |> Enum.map(&{AssetPipeline, &1})
+  end
+
+  defp live_watchers() do
+    [
+      [dir: "lib", notify: LibChangeHandler],
+      [dir: "priv/source", notify: TemplateChangeHandler],
+    ] ++ Application.get_env(:fermo, :live_watchers, [])
+    |> Enum.map(&{Watcher, &1})
+  end
+
   # Allow projects to add children
-  defp app_live_mode_servers() do
-    case Application.fetch_env(:fermo, :live_mode_servers) do
-      :error -> []
-      {:ok, servers} -> servers
-    end
+  defp live_mode_servers() do
+    Application.get_env(:fermo, :live_mode_servers, [])
   end
 end

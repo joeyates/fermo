@@ -1,22 +1,33 @@
 defmodule Fermo.Build do
-  @moduledoc false
+  @moduledoc """
+  Handles building the static site.
+
+  By default, the site is built in the './build' directory.
+
+  This path can be overridden via the `:build_path`
+  setting in `config`.
+  """
 
   import Mix.Fermo.Paths, only: [source_path: 0]
 
-  @config Application.get_env(:fermo, :config, Fermo.Config)
-  @ffile Application.get_env(:fermo, :ffile, Fermo.File)
-  @sitemap Application.get_env(:fermo, :sitemap, Fermo.Sitemap)
+  @config Application.compile_env(:fermo, :config, Fermo.Config)
+  @ffile Application.compile_env(:fermo, :ffile, Fermo.File)
+  @sitemap Application.compile_env(:fermo, :sitemap, Fermo.Sitemap)
+
+  @assets Application.compile_env(:fermo, :assets, [])
 
   @callback run(map()) :: {:ok, map()}
   def run(config) do
-    # TODO: check if Webpack assets are ready before building HTML
     config =
       config
       |> Map.put_new(:stats, %{})
       |> put_in([:stats, :build_started], Time.utc_now)
 
-    {:ok} = Fermo.Assets.build()
     {:ok} = Fermo.I18n.load()
+    if @assets && length(@assets) > 0 do
+      Enum.each(@assets, &(&1.build()))
+      Fermo.Assets.create_manifest()
+    end
 
     config =
       config

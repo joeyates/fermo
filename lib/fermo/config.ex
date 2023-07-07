@@ -1,10 +1,10 @@
 defmodule Fermo.Config do
   @moduledoc false
 
-  @i18n Application.get_env(:fermo, :i18n, Fermo.I18n)
-  @localizable Application.get_env(:fermo, :localizable, Fermo.Localizable)
-  @simple Application.get_env(:fermo, :simple, Fermo.Simple)
-  @template Application.get_env(:fermo, :template, Fermo.Template)
+  @i18n Application.compile_env(:fermo, :i18n, Fermo.I18n)
+  @localizable Application.compile_env(:fermo, :localizable, Fermo.Localizable)
+  @simple Application.compile_env(:fermo, :simple, Fermo.Simple)
+  @template Application.compile_env(:fermo, :template, Fermo.Template)
 
   def initial(config) do
     build_path = config[:build_path] || "build"
@@ -44,6 +44,12 @@ defmodule Fermo.Config do
     put_in(config, [:pages], pages ++ [page])
   end
 
+  @doc """
+  Indicate that a file should be simply copied to the build,
+  without any transformation.
+
+  You can also add statics via the `:statics` attribute in `config`.
+  """
   def add_static(config, source, filename) do
     statics = Map.get(config, :statics)
     put_in(config, [:statics], statics ++ [%{source: source, filename: filename}])

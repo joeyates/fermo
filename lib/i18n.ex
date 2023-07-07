@@ -1,12 +1,13 @@
 defmodule I18n do
   use GenServer
 
-  def init(args) do
-    {:ok, args}
+  def start_link(_opts) do
+    GenServer.start_link(__MODULE__, nil, name: :i18n)
   end
 
-  def start_link() do
-    GenServer.start_link(__MODULE__, nil, name: :i18n)
+  @impl true
+  def init(args) do
+    {:ok, args}
   end
 
   def put(translation_tree) do
@@ -27,6 +28,7 @@ defmodule I18n do
     translation
   end
 
+  @impl true
   def handle_call({:put, state}, _from, _state) do
     {:reply, {:ok}, state}
   end

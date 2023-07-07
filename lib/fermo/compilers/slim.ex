@@ -3,7 +3,7 @@ defmodule Fermo.Compilers.Slim do
   import Fermo.Naming
   alias Fermo.Compilers.EEx
 
-  @file_impl Application.get_env(:fermo, :file_impl, File)
+  @file_impl Application.compile_env(:fermo, :file_impl, File)
 
   @callback compile(String.t()) :: {:ok}
   def compile(template_project_path) do
@@ -27,6 +27,7 @@ defmodule Fermo.Compilers.Slim do
         frontmatter: frontmatter,
         content_fors: cfs_eex,
         template_project_path: template_project_path,
+        template_source_path: template_source_path,
         offset: offset
       }
     )

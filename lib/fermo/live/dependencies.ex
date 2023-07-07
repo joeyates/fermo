@@ -5,17 +5,18 @@ defmodule Fermo.Live.Dependencies do
 
   @name :fermo_dependencies
 
-  @config Application.get_env(:fermo, :config, Fermo.Config)
-  @i18n Application.get_env(:fermo, :i18n, Fermo.I18n)
+  @config Application.compile_env(:fermo, :config, Fermo.Config)
+  @i18n Application.compile_env(:fermo, :i18n, Fermo.I18n)
 
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts, name: @name)
+  end
+
+  @impl true
   def init(app_module: app_module) do
     {:ok} = @i18n.load()
     config = load_config(app_module)
     {:ok, %{config: config, app_module: app_module}}
-  end
-
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: @name)
   end
 
   def reinitialize() do
@@ -26,18 +27,19 @@ defmodule Fermo.Live.Dependencies do
     GenServer.call(@name, {:page_from_path, path})
   end
 
-  def pages_by_dependency(type, value) do
-    GenServer.call(@name, {:pages_by_dependency, type, value})
+  def pages_by_dependency(value) do
+    GenServer.call(@name, {:pages_by_dependency, value})
   end
 
   def start_page(path) do
     GenServer.call(@name, {:start_page, path})
   end
 
-  def add_page_dependency(path, type, value) do
-    GenServer.call(@name, {:add_page_dependency, path, type, value})
+  def add_page_dependency(path, value) do
+    GenServer.call(@name, {:add_page_dependency, path, value})
   end
 
+  @impl true
   def handle_call({:reinitialize}, _from, %{app_module: app_module} = state) do
     config = load_config(app_module)
     {:reply, {:ok}, Map.put(state, :config, config)}
@@ -52,10 +54,9 @@ defmodule Fermo.Live.Dependencies do
     end
   end
 
-  def handle_call({:pages_by_dependency, type, value}, _from, state) do
+  def handle_call({:pages_by_dependency, value}, _from, state) do
     pages = Enum.filter(state.config.pages, fn page ->
-      dependencies = page.dependencies[type] || []
-      Enum.member?(dependencies, value)
+      Enum.member?(page.dependencies, value)
     end)
     {:reply, {:ok, pages}, state}
   end
@@ -67,15 +68,14 @@ defmodule Fermo.Live.Dependencies do
     {:reply, {:ok}, state}
   end
 
-  def handle_call({:add_page_dependency, path, type, value}, _from, state) do
+  def handle_call({:add_page_dependency, path, value}, _from, state) do
     state = update_page(state, path, fn page ->
-      dependencies = page.dependencies[type] || []
-      dependencies = if Enum.member?(dependencies, value) do
-        dependencies
+      dependencies = if Enum.member?(page.dependencies, value) do
+        page.dependencies
       else
-        [value | dependencies]
+        [value | page.dependencies]
       end
-      put_in(page, [:dependencies, type], dependencies)
+      Map.put(page, :dependencies, dependencies)
     end)
 
     {:reply, {:ok}, state}
@@ -113,7 +113,7 @@ defmodule Fermo.Live.Dependencies do
         "/" <> rest -> rest
         path -> path
       end
-    Map.put(page, :dependencies, %{template: [template]})
+    Map.put(page, :dependencies, [template])
   end
 
   defp update_page(state, path, callback) do

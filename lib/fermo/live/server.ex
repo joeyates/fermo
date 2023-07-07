@@ -58,6 +58,9 @@ defmodule Fermo.Live.Server do
 
   defp serve_page(page, conn) do
     {:ok} = Fermo.Live.Dependencies.start_page(page.path)
+    if page.params.layout do
+      {:ok} = Fermo.Live.Dependencies.add_page_dependency(page.path, page.params.layout)
+    end
     html = live_page(page)
     respond_with_html(conn, html)
   end
