@@ -61,11 +61,9 @@ defmodule Fermo.Live.App do
     ]
   end
 
-  defp live_mode_assets() do
-    case Application.fetch_env(:fermo, :live_mode_assets) do
-      :error -> []
-      {:ok, spec} -> spec
-    end
+  defp live_asset_pipelines() do
+    Application.get_env(:fermo, :live_asset_pipelines, [])
+    |> Enum.map(&{AssetPipeline, &1})
   end
 
   defp live_watchers() do
@@ -78,9 +76,6 @@ defmodule Fermo.Live.App do
 
   # Allow projects to add children
   defp live_mode_servers() do
-    case Application.fetch_env(:fermo, :live_mode_servers) do
-      :error -> []
-      {:ok, servers} -> servers
-    end
+    Application.get_env(:fermo, :live_mode_servers, [])
   end
 end
