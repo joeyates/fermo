@@ -18,6 +18,11 @@ defmodule Fermo.Sitemap do
   * `:default_change_frequency` - see https://www.sitemaps.org/protocol.html#changefreqdef
   * `:default_priority` - a value between 0 and 1
 
+  Other `config` options that affect the sitemap are:
+
+  * `:base_url`
+  * `:build_path`
+
   Use a template's frontmatter to exclude it from the sitemap:
 
       ---
