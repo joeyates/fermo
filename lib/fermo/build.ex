@@ -24,7 +24,7 @@ defmodule Fermo.Build do
       |> put_in([:stats, :build_started], Time.utc_now)
 
     {:ok} = Fermo.I18n.load()
-    if @assets && length(@assets) > 0 do
+    if Enum.any?(@assets) do
       Enum.each(@assets, &(&1.build()))
       Fermo.Assets.create_manifest()
     end
