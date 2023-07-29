@@ -19,9 +19,12 @@ of the site, the live mode for development.
 
 Two GenServers are started by `Fermo.App`.
 
-`I18n` handles internationalization mapping keys to translations.
+1. `I18n` handles internationalization mapping keys to translations,
+2. `Fermo.Assets` which uses the asset manifest to map asset names
+to their fingerprinted paths.
 
-`Fermo.Assets` handles linking to digested assets files.
+`Fermo.Build` runs any configured asset builds, and has `Fermo.Assets`
+create and load the asset manifest.
 
 # live mode
 
