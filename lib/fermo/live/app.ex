@@ -14,6 +14,12 @@ defmodule Fermo.Live.App do
     Watcher
   }
 
+  @assets Application.compile_env(:fermo, :assets, [])
+  @code_watchers [
+    [dir: "lib", notify: LibChangeHandler],
+    [dir: "priv/source", notify: TemplateChangeHandler],
+  ]
+
   def start(_type, _args) do
     Application.ensure_all_started(:telemetry)
     Application.ensure_all_started(:cowboy)
@@ -68,12 +74,32 @@ defmodule Fermo.Live.App do
     |> Enum.map(&{AssetPipeline, &1})
   end
 
-  defp live_watchers() do
-    [
-      [dir: "lib", notify: LibChangeHandler],
-      [dir: "priv/source", notify: TemplateChangeHandler],
-    ] ++ Application.get_env(:fermo, :live_watchers, [])
+  defp live_watchers do
+    (@code_watchers ++ asset_watchers())
     |> Enum.map(&{Watcher, &1})
+  end
+
+  defp asset_watchers do
+    if Enum.any?(@assets) do
+      matches =
+        @assets
+        |> Enum.flat_map(&(&1.output))
+        |> Enum.map(&Regex.escape/1)
+        |> Enum.join("|")
+      wanted = Regex.compile!("(#{matches})$")
+      [
+        [
+          dir: "build",
+          wanted: wanted,
+          call: [
+            {Fermo.Assets, :create_manifest, []},
+            {Fermo.Live.SocketRegistry, :reload, []}
+          ]
+        ]
+      ]
+    else
+      []
+    end
   end
 
   # Allow projects to add children
