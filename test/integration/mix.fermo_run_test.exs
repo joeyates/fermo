@@ -17,7 +17,6 @@ defmodule Mix.FermoRunTest do
       {_clean_output, 0} = System.cmd("git", ["clean", "-ffdx"])
       {_deps_output, 0} = System.cmd("mix", ["deps.get"], env: env, stderr_to_stdout: true)
       {_compile_output, 0} = System.cmd("mix", ["compile"], env: env, stderr_to_stdout: true)
-      {_yarn_output, 0} = System.cmd("yarn", [], stderr_to_stdout: true)
       {_build_output, 0} = System.cmd("mix", ["fermo.build"], env: env, stderr_to_stdout: true)
     end)
 

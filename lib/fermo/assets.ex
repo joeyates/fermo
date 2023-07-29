@@ -162,11 +162,6 @@ defmodule Fermo.Assets do
     path!(filename)
   end
 
-  @doc """
-  If your assets pipeline has a hot reloading dev server
-  (e.g. with Webpack), set `:live_asset_base` to
-  the base URL of the webserver, e.g. '//localhost:8080'
-  """
   def live_asset_path(filename) do
     manifest_path = path!(filename)
     Path.join(@live_asset_base, manifest_path)

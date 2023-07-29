@@ -28,13 +28,11 @@ defmodule Fermo.New do
     "lib/helpers.ex",
     "lib/<%= project[:app] %>.ex",
     "mix.exs",
-    "package.json",
     "priv/source/javascripts/application.js",
     "priv/source/layouts/layout.html.slim",
     "priv/source/stylesheets/application.sass",
     "priv/source/templates/home.html.slim",
-    "README.md",
-    "webpack.config.js"
+    "README.md"
   ]
 
   @other_deps """
@@ -63,7 +61,6 @@ defmodule Fermo.New do
           cd #{options.base_path}
           mix deps.get
           mix compile
-          yarn
           mix fermo.live
 
         You'll need to create a DatoCMS site and set its API key in .envrc

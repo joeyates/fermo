@@ -1,6 +1,6 @@
 In its default configuration, Fermo does not handle assets.
 
-ESBuild and Webpack can be activated using the modules provided
+ESBuild and Tailwind can be activated using the modules provided
 (see below).
 
 If you want to use another build system, just provide a
@@ -43,7 +43,3 @@ and add `:esbuild` to `mix.exs`:
 
 This provides a standard ESBuild setup for development live mode
 and for static production builds.
-
-# Webpack
-
-TODO

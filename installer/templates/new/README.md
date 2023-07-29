@@ -4,7 +4,6 @@
 
 ```sh
 $ mix deps.get
-$ yarn # ...or npm install
 ```
 
 # Development

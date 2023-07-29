@@ -22,7 +22,6 @@ Install dependencies:
 
 ```sh
 mix deps.get
-yarn install
 ```
 
 Build the project:
