@@ -15,10 +15,18 @@ defmodule Mix.Fermo.Paths do
     Path.relative_to(path, app_path)
   end
 
+  @doc """
+  Returns the path relative to `priv/source` for the given path.
+  """
   def absolute_to_source("/" <> path) do
     absolute_to_source(path)
   end
+
+  def absolute_to_source(@source_path <> path) do
+    absolute_to_source(path)
+  end
+
   def absolute_to_source(path) do
-    Path.relative_to(path, @source_path)
+    path
   end
 end

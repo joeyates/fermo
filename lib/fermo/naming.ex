@@ -1,4 +1,8 @@
 defmodule Fermo.Naming do
+  def source_path_to_module("/" <> path) do
+    source_path_to_module(path)
+  end
+
   def source_path_to_module(path) do
     base =
       path
