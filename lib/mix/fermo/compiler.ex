@@ -3,7 +3,7 @@ defmodule Mix.Fermo.Compiler do
 
   require Logger
 
-  import Mix.Fermo.Paths, only: [full_source_path: 0]
+  alias Mix.Fermo.Paths
 
   # Implementations for testing
   @compilers Application.compile_env(:fermo, :compilers, Fermo.Compilers)
@@ -16,7 +16,7 @@ defmodule Mix.Fermo.Compiler do
     compilation_timestamp = compilation_timestamp()
     ensure_helpers_module()
 
-    all_sources = @compilers.templates(full_source_path())
+    all_sources = @compilers.templates(Paths.full_source_path())
     timestamp = @mix_compiler_manifest.timestamp()
     helpers_changed = helpers_changed?(timestamp)
     changed = if helpers_changed do
