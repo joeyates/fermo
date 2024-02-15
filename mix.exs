@@ -4,7 +4,7 @@ defmodule Fermo.MixProject do
   # N.B.: Keep aligned with the versions in installer/mix.exs
   @version "0.17.1"
   @elixir_version "~> 1.9"
-  @git_origin "https://github.com/leanpanda-com/fermo"
+  @git_origin "https://github.com/joeyates/fermo"
 
   def project do
     [
