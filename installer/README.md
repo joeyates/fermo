@@ -6,6 +6,6 @@ To install from Hex, run:
 
     $ mix archive.install hex fermo_new
 
-The run:
+Then run:
 
     $ mix fermo.new PATH

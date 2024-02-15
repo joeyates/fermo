@@ -17,7 +17,7 @@ defmodule Fermo.NewTest do
     :ok
   end
 
-  test "it create the directory" do
+  test "it creates the directory" do
     test_pid = self()
 
     stub(Mix.GeneratorMock, :create_directory, fn path ->
