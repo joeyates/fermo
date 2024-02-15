@@ -1,4 +1,6 @@
 defmodule Fermo.I18n do
+  require Logger
+
   @callback load() :: {:ok}
   @callback load(String.t()) :: {:ok}
   def load(path \\ "priv/locales/**/*.yml") do
@@ -83,12 +85,12 @@ defmodule Fermo.I18n do
     |> put_in([:stats, :optionally_build_path_map_completed], Time.utc_now)
   end
   def optionally_build_path_map(%{path_map: true} = config) do
-    IO.warn """
+    Logger.warning("""
     `config.path_map` is deprecated.
 
     Set `config.localized_paths: true` in order to get a per-page Map
     of localized pages.
-    """
+    """)
     optionally_build_path_map(Map.put(config, :localized_paths, true))
   end
   def optionally_build_path_map(config), do: config
