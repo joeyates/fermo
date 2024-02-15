@@ -4,7 +4,7 @@ defmodule Fermo.New.MixProject do
   # N.B.: Keep aligned with the versions in ../mix.exs
   @version "0.17.1"
   @elixir_version "~> 1.9"
-  @scm_url "https://github.com/leanpanda.com/fermo"
+  @scm_url "https://github.com/joeyates/fermo"
 
   def project do
     [
@@ -23,7 +23,7 @@ defmodule Fermo.New.MixProject do
       preferred_cli_env: [docs: :docs],
       source_url: @scm_url,
       docs: docs(),
-      homepage_url: "https://www.getfermo.com",
+      homepage_url: @scm_url,
       description: """
       Fermo project generator.
 

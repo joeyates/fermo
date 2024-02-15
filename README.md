@@ -1,4 +1,4 @@
-![Build Status](https://github.com/leanpanda-com/fermo/actions/workflows/elixir.yml/badge.svg?branch=main)
+![Build Status](https://github.com/joeyates/fermo/actions/workflows/elixir.yml/badge.svg?branch=main)
 
 # Fermo
 
