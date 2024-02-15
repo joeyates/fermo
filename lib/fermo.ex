@@ -29,6 +29,20 @@ defmodule Fermo do
     end
   end
 
+  @doc """
+  Add a page to the configuration
+
+  pages are the main way to add dynamic pages to Fermo.
+
+  ## Examples
+
+      page(
+        config,
+        "/templates/home.html.slim",
+        "/index.html",
+        %{id: "home", path: "/"}
+      )
+  """
   def page(config, template, filename, params \\ nil) do
     Fermo.Config.add_page(config, template, filename, params)
   end

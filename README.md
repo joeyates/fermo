@@ -229,7 +229,8 @@ Information about the top-level page.
   Note that this filename gets standardized. E.g., if you supply
   "foo.html", that will get corrected to "foo/index.html",
 * `:path` - the online path of the page,
-* `:params` - the parameters passed to the template.
+* `:params` - the parameters passed to the template,
+* `:live` - true when running as `mix fermo.live`.
 
 ## Partials
 

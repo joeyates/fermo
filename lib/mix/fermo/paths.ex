@@ -1,4 +1,7 @@
 defmodule Mix.Fermo.Paths do
+  @doc """
+  priv/source is the path where all templates, statics, and other source files are located.
+  """
   @source_path "priv/source"
 
   def source_path, do: @source_path
