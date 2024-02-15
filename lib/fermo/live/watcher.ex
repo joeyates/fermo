@@ -25,9 +25,7 @@ defmodule Fermo.Live.Watcher do
         GenServer.start_link(__MODULE__, opts)
 
       other ->
-        Logger.warn """
-        Failed to start file watcher for live reload
-        """
+        Logger.warning("Failed to start file watcher for live reload")
         {:error, other}
     end
   end
