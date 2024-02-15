@@ -5,6 +5,12 @@ defmodule FermoTest do
   setup :verify_on_exit!
 
   describe "page/4" do
+    setup do
+      stub(FileMock, :exists?, fn "priv/source/template" -> true end)
+
+      :ok
+    end
+
     test "it adds the page" do
       config = Fermo.page(%{pages: []}, "template", "output.html", "params")
 

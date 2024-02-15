@@ -39,9 +39,19 @@ defmodule Fermo.Config do
   end
 
   def add_page(config, template, filename, params \\ %{}) do
-    pages = Map.get(config, :pages, [])
-    page = page_from(template, filename, params)
-    put_in(config, [:pages], pages ++ [page])
+    if Fermo.Paths.source_file_exists?(template) do
+      pages = Map.get(config, :pages, [])
+      page = page_from(template, filename, params)
+      config = put_in(config, [:pages], pages ++ [page])
+      {:ok, config}
+    else
+      {:error, "Template not found: #{template}"}
+    end
+  end
+
+  def add_page!(config, template, filename, params \\ %{}) do
+    {:ok, config} = add_page(config, template, filename, params)
+    config
   end
 
   @doc """

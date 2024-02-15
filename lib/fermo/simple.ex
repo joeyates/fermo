@@ -38,7 +38,7 @@ defmodule Fermo.Simple do
       else
         is_html = String.ends_with?(template, ".html.#{extension}")
         filename = Fermo.Paths.template_to_filename(template, as_index_html: is_html)
-        Fermo.Config.add_page(config, template, filename, %{})
+        Fermo.Config.add_page!(config, template, filename, %{})
       end
     end)
   end

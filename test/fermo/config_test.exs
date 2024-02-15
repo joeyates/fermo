@@ -6,18 +6,28 @@ defmodule Fermo.ConfigTest do
 
   setup :verify_on_exit!
 
-  describe "add_page/4" do
+  describe "add_page!/4" do
     setup do
+      stub(FileMock, :exists?, fn
+        "priv/source/exists.html" -> true
+        "priv/source/doesnt_exist.html" -> false
+      end)
       config = %{pages: []}
 
       %{config: config}
     end
 
     test "it adds a page", context do
-      config = Config.add_page(context.config, "template", "output.html", "params")
+      config = Config.add_page!(context.config, "exists.html", "output.html", "params")
 
       page = hd(config.pages)
-      assert page == %{template: "template", filename: "output.html", params: "params"}
+      assert page == %{template: "exists.html", filename: "output.html", params: "params"}
+    end
+
+    test "when the template doesn't exist, it fails", context do
+      assert_raise MatchError, ~r/Template not found/, fn ->
+        Config.add_page!(context.config, "doesnt_exist.html", "output.html", "params")
+      end
     end
   end
 

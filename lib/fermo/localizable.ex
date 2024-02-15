@@ -32,7 +32,7 @@ defmodule Fermo.Localizable do
           else
             "/#{locale}/#{filename}"
           end
-        Fermo.Config.add_page(config, template, localized_filename, %{locale: locale})
+        Fermo.Config.add_page!(config, template, localized_filename, %{locale: locale})
       end)
     end)
   end

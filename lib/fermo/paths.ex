@@ -1,4 +1,8 @@
 defmodule Fermo.Paths do
+  @source_path "priv/source"
+
+  @file_impl Application.compile_env(:fermo, :file_impl, File)
+
   def filename_to_path(path, opts \\ [])
   def filename_to_path(filename, as_index_html: true) do
     cond do
@@ -35,5 +39,10 @@ defmodule Fermo.Paths do
     without_templating_extension = String.replace(template, ~r(\.[a-z]+$), "")
 
     path_to_filename(without_templating_extension, opts)
+  end
+
+  def source_file_exists?(path) do
+    Path.join(@source_path, path)
+    |> @file_impl.exists?()
   end
 end
