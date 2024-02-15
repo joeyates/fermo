@@ -7,7 +7,7 @@ defmodule Mix.Fermo.Paths do
   def source_path, do: @source_path
 
   def app_path do
-    deps_path = Mix.Project.config[:deps_path]
+    deps_path = Mix.Project.config()[:deps_path]
     Path.dirname(deps_path)
   end
 
