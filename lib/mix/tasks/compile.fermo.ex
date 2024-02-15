@@ -1,10 +1,8 @@
 defmodule Mix.Tasks.Compile.Fermo do
   use Mix.Task
 
-  @shortdoc "Compile project templates"
-
   @moduledoc """
-  Compile all templates that have changed since the last compile
+  Compile EEx and Slime templates
   """
   def run(_args) do
     Mix.Fermo.Compiler.run()

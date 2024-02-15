@@ -4,6 +4,11 @@
 
 A static site generator, build for speed and flexibility.
 
+## Templates and Data
+
+Fermo follows a templating approach. One template can be used
+to produce many similar pages by injecting data from an external source.
+
 # Project Creation
 
 Install the project generator:
@@ -49,7 +54,6 @@ when changes are detected.
 * handle Middleman-like [config-defined pages](#config-defined-pages),
 * create [sitemaps](#sitemaps),
 * handle localized pages,
-* use an integrated [Webpack asset pipeline](#webpack-asset-pipeline).
 
 # Project Structure
 
@@ -74,8 +78,10 @@ when changes are detected.
 |       +-- stylesheets
 |       +-- templates
 +-- README.md
-+-- webpack.config.js
 ```
+
+All files under `priv/source` with `.eex` and `.slim` extensions
+are treated as HTML templates.
 
 # Mix Configuration
 
@@ -325,21 +331,6 @@ the id in the template's frontmatter:
 ---
 id: my-localized-page
 ---
-```
-
-## <a name="webpack-asset-pipeline"></a>Webpack asset pipeline
-
-`mix fermo.build` runs Webpack to produce static assets.
-
-`mix fermo.live` runs Webpack dev server.
-
-It is assumed that you are using Webpack >= 5.
-
-If you are using Webpack <= 4.x, you'll need to add the following to your
-`config/config.exs`:
-
-```elixir
-config :fermo, webpack_dev_server_command: "yarn run webpack serve --watch-stdin"
 ```
 
 # Testing

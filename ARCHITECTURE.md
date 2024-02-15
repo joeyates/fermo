@@ -1,8 +1,14 @@
 Fermo produces static web sites.
 
-It is included as a dependency in projects containing template files.
+# HTML Templates
 
-To do so, it uses EEx and Slime to convert HTML templates into HTML.
+Projects using Fermo contain EEx and Slime templates.
+
+Fermo compiles the project's templates into modules, thanks to the addition of `:fermo`
+to the list of project compilers.
+This addition causes the `compile.fermo` Mix task to be called by the Elixir compiler.
+
+# Assets
 
 Assests are handled via optional pipelines which can be configured.
 
