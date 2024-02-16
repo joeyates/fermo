@@ -64,7 +64,7 @@ defmodule Fermo.MixProject do
       {:morphix, ">= 0.0.0"},
       {:mox, ">= 0.0.0", only: :test, runtime: false},
       {:plug_cowboy, "~> 2.0"},
-      {:slime, "~> 1.2.1"},
+      {:slime, "~> 1.3.0", github: "joeyates/slime", ref: "13fab1f3a12016135a07402a31e5c96d745145f0"},
       {:yaml_elixir, "~> 1.3.0"}
     ]
   end
