@@ -1,6 +1,6 @@
 run_integration = System.get_env("FERMO_RUN_INTEGRATION")
 if run_integration do
-  ExUnit.start()
+  ExUnit.start(capture_log: true)
 else
-  ExUnit.start(exclude: [:integration])
+  ExUnit.start(capture_log: true, exclude: [:integration])
 end
