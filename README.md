@@ -362,6 +362,12 @@ HTML coverage:
 $ mix coveralls.html
 ```
 
+Use [Earthly](https://earthly.dev/) to run tests against various versions of Elixir and Erlang.
+
+```sh
+earthly +all
+```
+
 # Middleman to Fermo
 
 Fermo was created as an improvement on Middleman, so its defaults

@@ -11,23 +11,19 @@ jobs:
 
     name: Build and test
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        elixirbase:
+        - 1.13.4-erlang-24.3.4.16-ubuntu-jammy-20240125
+        - 1.14.5-erlang-24.3.4.16-ubuntu-jammy-20240125
+        - 1.16.1-erlang-24.3.4.16-ubuntu-jammy-20240125
     env:
       FERMO_RUN_INTEGRATION: 1
 
     steps:
+    - name: Set up Earthly
+      uses: earthly/actions-setup@v1
     - uses: actions/checkout@v4
-    - name: Set up Elixir
-      uses: erlef/setup-beam@v1
-      with:
-        elixir-version: '1.16.0'
-        otp-version: '26.0.2'
-    - name: Restore dependencies cache
-      uses: actions/cache@v4
-      with:
-        path: deps
-        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-        restore-keys: ${{ runner.os }}-mix-
-    - name: Install dependencies
-      run: mix deps.get
-    - name: Run tests
-      run: mix test
+    - name: Run tests under ${{matrix.elixirbase}}
+      run: earthly -P --ci --build-arg ELIXIR_BASE=${{matrix.elixirbase}} --build-arg COVERALLS_GITHUB=true +test
