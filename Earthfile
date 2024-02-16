@@ -5,6 +5,7 @@ all:
   BUILD \
     --build-arg ELIXIR_BASE=1.13.4-erlang-24.3.4.16-ubuntu-jammy-20240125 \
     --build-arg ELIXIR_BASE=1.14.5-erlang-24.3.4.16-ubuntu-jammy-20240125 \
+    --build-arg ELIXIR_BASE=1.15.7-erlang-24.3.4.16-ubuntu-jammy-20240125 \
     --build-arg ELIXIR_BASE=1.16.1-erlang-24.3.4.16-ubuntu-jammy-20240125 \
     +test
 
