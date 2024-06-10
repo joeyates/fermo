@@ -2,7 +2,7 @@ defmodule Fermo.MixProject do
   use Mix.Project
 
   # N.B.: Keep aligned with the versions in installer/mix.exs
-  @version "0.18.0"
+  @version "0.18.1"
   @elixir_version "~> 1.9"
   @git_origin "https://github.com/joeyates/fermo"
 
@@ -64,7 +64,7 @@ defmodule Fermo.MixProject do
       {:morphix, ">= 0.0.0"},
       {:mox, ">= 0.0.0", only: :test, runtime: false},
       {:plug_cowboy, "~> 2.0"},
-      {:jgy_slime, "~> 1.3.0"},
+      {:slime, "~> 1.3.1"},
       {:yaml_elixir, "~> 1.3.0"}
     ]
   end
