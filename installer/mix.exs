@@ -2,8 +2,8 @@ defmodule Fermo.New.MixProject do
   use Mix.Project
 
   # N.B.: Keep aligned with the versions in ../mix.exs
-  @version "0.18.1"
-  @elixir_version "~> 1.9"
+  @version "0.19.0"
+  @elixir_version "~> 1.17"
   @scm_url "https://github.com/joeyates/fermo"
 
   def project do
@@ -12,7 +12,7 @@ defmodule Fermo.New.MixProject do
       start_permanent: Mix.env() == :prod,
       version: @version,
       elixir: @elixir_version,
-      elixirc_paths: elixirc_paths(Mix.env),
+      elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       package: [
         maintainers: ["Joe Yates"],
@@ -35,7 +35,7 @@ defmodule Fermo.New.MixProject do
 
   def application do
     [
-      extra_applications: extra_applications(Mix.env()),
+      extra_applications: extra_applications(Mix.env())
     ]
   end
 
