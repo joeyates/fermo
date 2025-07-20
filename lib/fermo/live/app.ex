@@ -17,7 +17,7 @@ defmodule Fermo.Live.App do
   @assets Application.compile_env(:fermo, :assets, [])
   @code_watchers [
     [dir: "lib", notify: LibChangeHandler],
-    [dir: "priv/source", notify: TemplateChangeHandler],
+    [dir: "priv/source", notify: TemplateChangeHandler]
   ]
 
   def start(_type, _args) do
@@ -26,22 +26,20 @@ defmodule Fermo.Live.App do
 
     cowboy = {
       Plug.Cowboy,
-      scheme: :http,
-      plug: Server,
-      options: [dispatch: dispatch(), port: port()]
+      scheme: :http, plug: Server, options: [dispatch: dispatch(), port: port()]
     }
 
     app_module = Mix.Fermo.Module.module!()
 
     children =
       live_mode_servers() ++
-      [
-        cowboy,
-        {Dependencies, [app_module: app_module]},
-        {SocketRegistry, []}
-      ] ++
-      live_watchers() ++
-      live_asset_pipelines()
+        [
+          cowboy,
+          {Dependencies, [app_module: app_module]},
+          {SocketRegistry, []}
+        ] ++
+        live_watchers() ++
+        live_asset_pipelines()
 
     {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one)
 
@@ -86,7 +84,9 @@ defmodule Fermo.Live.App do
         |> Enum.flat_map(&(&1.output))
         |> Enum.map(&Regex.escape/1)
         |> Enum.join("|")
+
       wanted = Regex.compile!("(#{matches})$")
+
       [
         [
           dir: "build",
