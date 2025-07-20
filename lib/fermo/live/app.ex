@@ -81,7 +81,7 @@ defmodule Fermo.Live.App do
     if Enum.any?(@assets) do
       matches =
         @assets
-        |> Enum.flat_map(&(&1.output))
+        |> Enum.flat_map(& &1.output())
         |> Enum.map(&Regex.escape/1)
         |> Enum.join("|")
 

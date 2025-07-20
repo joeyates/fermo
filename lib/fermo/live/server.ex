@@ -152,7 +152,7 @@ defmodule Fermo.Live.Server do
         {:ok, ""}
 
       String.starts_with?(maybe_with_dot, ".") ->
-        {:ok, String.slice(maybe_with_dot, 1..-1)}
+        {:ok, String.slice(maybe_with_dot, 1..-1//1)}
 
       true ->
         {:error, :unexpected_extname_result}
