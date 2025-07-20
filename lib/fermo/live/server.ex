@@ -7,11 +7,14 @@ defmodule Fermo.Live.Server do
   live_reload_js_path = Application.app_dir(:fermo, "priv/static/fermo-live.js.eex")
   @external_resource live_reload_js_path
 
-  @live_reload_js EEx.eval_string("""
-  <script type="text/javascript">
-  #{File.read!(live_reload_js_path)}
-  </script>
-  """, env: System.get_env())
+  @live_reload_js EEx.eval_string(
+                    """
+                    <script type="text/javascript">
+                    #{File.read!(live_reload_js_path)}
+                    </script>
+                    """,
+                    env: System.get_env()
+                  )
 
   def init(_options) do
     []
@@ -24,17 +27,20 @@ defmodule Fermo.Live.Server do
   defp handle_request_path({:error, :request_path_missing}, conn) do
     respond_403(conn)
   end
+
   defp handle_request_path({:ok, request_path}, conn) do
-    Logger.debug "[Fermo.Live.Server] GET #{request_path}"
+    Logger.debug("[Fermo.Live.Server] GET #{request_path}")
+
     if is_static?(request_path) do
       serve_static(request_path, conn)
     else
       case find_page(request_path) do
         {:ok, page} ->
-          Logger.debug "[Fermo.Live.Server] Serving page #{request_path}"
+          Logger.debug("[Fermo.Live.Server] Serving page #{request_path}")
           serve_page(page, conn)
+
         _ ->
-          Logger.debug "[Fermo.Live.Server] Page #{request_path} not found"
+          Logger.debug("[Fermo.Live.Server] Page #{request_path} not found")
           respond_404(conn)
       end
     end
@@ -58,9 +64,11 @@ defmodule Fermo.Live.Server do
 
   defp serve_page(page, conn) do
     {:ok} = Fermo.Live.Dependencies.start_page(page.path)
+
     if page.params.layout do
       {:ok} = Fermo.Live.Dependencies.add_page_dependency(page.path, page.params.layout)
     end
+
     html = live_page(page)
     respond_with_html(conn, html)
   end
@@ -109,9 +117,12 @@ defmodule Fermo.Live.Server do
 
   defp request_path(conn) do
     case conn.request_path do
-      nil -> {:error, :request_path_missing}
+      nil ->
+        {:error, :request_path_missing}
+
       _ ->
         expanded = Path.expand(conn.request_path)
+
         if expanded == "/" do
           {:ok, "/"}
         else
@@ -131,14 +142,18 @@ defmodule Fermo.Live.Server do
 
   defp extension(path) do
     maybe_with_dot = Path.extname(path)
+
     cond do
       maybe_with_dot == "" ->
         {:ok, ""}
+
       maybe_with_dot == "." ->
         # We'll treat files with a final dot as HTML
         {:ok, ""}
+
       String.starts_with?(maybe_with_dot, ".") ->
         {:ok, String.slice(maybe_with_dot, 1..-1)}
+
       true ->
         {:error, :unexpected_extname_result}
     end
