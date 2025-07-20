@@ -1,13 +1,17 @@
 defmodule Fermo.Assets.ESBuild do
-  @behaviour Fermo.Assets.Builder
+  if Application.spec(:esbuild) do
+    require Esbuild
 
-  def build() do
-    # Unless there is an override, run standard ESBuild
-    Esbuild.install_and_run(:default, [])
-    {:ok}
-  end
+    @behaviour Fermo.Assets.Builder
 
-  def output do
-    ~w(application.js)
+    def build() do
+      # Unless there is an override, run standard ESBuild
+      Esbuild.install_and_run(:default, [])
+      {:ok}
+    end
+
+    def output do
+      ~w(application.js)
+    end
   end
 end

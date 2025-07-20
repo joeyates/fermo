@@ -57,6 +57,7 @@ defmodule Fermo.MixProject do
   defp deps do
     [
       {:deep_merge, ">= 1.0.0"},
+      {:esbuild, ">= 0.0.0", optional: true},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:excoveralls, ">= 0.0.0", only: :test},
       {:file_system, ">= 0.0.0"},
@@ -65,6 +66,7 @@ defmodule Fermo.MixProject do
       {:mox, ">= 0.0.0", only: :test, runtime: false},
       {:plug_cowboy, "~> 2.0"},
       {:slime, "~> 1.3.1"},
+      {:tailwind, ">= 0.0.0", optional: true},
       {:yaml_elixir, "~> 1.3.0"}
     ]
   end
