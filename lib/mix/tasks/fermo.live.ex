@@ -8,10 +8,10 @@ defmodule Mix.Tasks.Fermo.Live do
   watches for changes to templates and recompiles them.
   """
   def run(_args) do
-    Mix.Task.run "app.start"
+    Mix.Task.run("app.start")
     {:ok, _pid} = Fermo.Live.App.start(:normal, [])
     port = Fermo.Live.App.port()
-    IO.puts "Fermo Live is running on port #{port}"
+    IO.puts("Fermo Live is running on port #{port}")
     Process.sleep(:infinity)
   end
 end

@@ -22,6 +22,7 @@ defmodule Fermo.Live.Watcher do
           opts
           |> Enum.into(%{})
           |> Map.put(:pid, pid)
+
         GenServer.start_link(__MODULE__, opts)
 
       other ->
@@ -39,9 +40,11 @@ defmodule Fermo.Live.Watcher do
   @impl true
   def handle_info({:file_event, _pid, {path, events}}, state) do
     with true <- is_ready?(events),
-         true <- wanted?(path, state) do
+         true <- wanted?(path, state),
+         true <- File.regular?(path) do
       dispatch(path, state)
     end
+
     {:noreply, state}
   end
 
@@ -59,7 +62,7 @@ defmodule Fermo.Live.Watcher do
   end
 
   def dispatch_call(_path, %{call: {m, f, a}}) do
-    Logger.debug "Fermo.Live.Watcher calling #{m}.#{f}(#{inspect(a)})"
+    Logger.debug("Fermo.Live.Watcher calling #{m}.#{f}(#{inspect(a)})")
     apply(m, f, a)
   end
 
@@ -74,14 +77,14 @@ defmodule Fermo.Live.Watcher do
   end
 
   def dispatch_notify(path, %{notify: module}) do
-    Logger.debug "Fermo.Live.Watcher notifying #{module} of change to file '#{path}'"
+    Logger.debug("Fermo.Live.Watcher notifying #{module} of change to file '#{path}'")
     apply(module, :notify, [path])
   end
 
   def dispatch_notify(_path, _state), do: {:ok}
 
   defp is_ready?(events) do
-    (:modified in events) && (:closed in events)
+    :modified in events && :closed in events
   end
 
   defp wanted?(path, %{wanted: wanted}) do

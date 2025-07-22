@@ -8,7 +8,8 @@ defmodule Fermo.Template do
 
   @callback defaults_for(module()) :: map()
   def defaults_for(module) do
-    apply(module, :defaults, [])
+    module
+    |> apply(:defaults, [])
     |> Enum.into(
       %{},
       fn {key, value} ->
@@ -31,6 +32,7 @@ defmodule Fermo.Template do
   @callback build_context(module(), String.t(), map()) :: map()
   def build_context(module, template, page) do
     env = System.get_env()
+
     %{
       module: module,
       template: template,

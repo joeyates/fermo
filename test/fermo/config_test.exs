@@ -1,5 +1,6 @@
 defmodule Fermo.ConfigTest do
   use ExUnit.Case, async: true
+
   import Mox
 
   alias Fermo.Config
@@ -12,6 +13,7 @@ defmodule Fermo.ConfigTest do
         "priv/source/exists.html" -> true
         "priv/source/doesnt_exist.html" -> false
       end)
+
       config = %{pages: []}
 
       %{config: config}
@@ -123,7 +125,7 @@ defmodule Fermo.ConfigTest do
     test "it initializes stats", context do
       config = Config.initial(context.config)
 
-      assert Map.has_key?(config.stats, :start)
+      config.stats |> Map.has_key?(:start) |> assert()
     end
   end
 
@@ -131,17 +133,19 @@ defmodule Fermo.ConfigTest do
     setup context do
       defaults = Map.get(context, :defaults, %{})
       # This depends on the default content_for returning "" and not nil
-      pages = Map.get(
-        context,
-        :pages,
-        [
-          %{
-            template: "mock_template.html.slim",
-            filename: "output.html",
-            params: %{foo: :bar}
-          }
-        ]
-      )
+      pages =
+        Map.get(
+          context,
+          :pages,
+          [
+            %{
+              template: "mock_template.html.slim",
+              filename: "output.html",
+              params: %{foo: :bar}
+            }
+          ]
+        )
+
       content_for_path = Map.get(context, :content_for_path, "")
 
       stub(Fermo.TemplateMock, :module_for_template, fn _ -> "module" end)
@@ -158,11 +162,12 @@ defmodule Fermo.ConfigTest do
         statics: []
       }
 
-      config = if Map.has_key?(context, :config_layout) do
-        Map.put(config, :layout, context.config_layout)
-      else
-        config
-      end
+      config =
+        if Map.has_key?(context, :config_layout) do
+          Map.put(config, :layout, context.config_layout)
+        else
+          config
+        end
 
       Map.merge(context, %{config: config})
     end
@@ -193,7 +198,8 @@ defmodule Fermo.ConfigTest do
     end
 
     @tag content_for_path: "ciao"
-    test "when the template overrides the path, it bases the output filename on the override", context do
+    test "when the template overrides the path, it bases the output filename on the override",
+         context do
       config = Config.post_config(context.config)
 
       page = hd(config.pages)
@@ -257,7 +263,9 @@ defmodule Fermo.ConfigTest do
 
     @tag config_layout: "from_config"
     @tag defaults: %{layout: "from_frontmatter"}
-    @tag pages: [%{template: "mock_template", filename: "filename", params: %{layout: "from_page"}}]
+    @tag pages: [
+           %{template: "mock_template", filename: "filename", params: %{layout: "from_page"}}
+         ]
     test "the page layout takes precedence over the frontmatter and config layouts", context do
       config = Config.post_config(context.config)
 

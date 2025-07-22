@@ -41,7 +41,7 @@ defmodule Fermo.Live.AssetPipeline do
         relative = Path.relative_to_cwd(cmd)
 
         Logger.error(
-          "Could not start watcher #{inspect(relative)} from #{inspect(cd(opts))}, executable does not exist"
+          "Could not start watcher #{inspect(relative)} from #{opts |> cd() |> inspect()}, executable does not exist"
         )
 
         exit(:shutdown)

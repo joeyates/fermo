@@ -6,6 +6,7 @@ end
 
 defmodule Fermo.BuildTest do
   use ExUnit.Case, async: true
+
   import Mox
 
   setup :verify_on_exit!
@@ -29,6 +30,7 @@ defmodule Fermo.BuildTest do
       },
       pathname: "page/path"
     }
+
     config = %{build_path: "foo", pages: [page]}
 
     expect(Fermo.FileMock, :save, fn "page/path", "rendered content" -> :ok end)

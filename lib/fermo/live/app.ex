@@ -6,18 +6,17 @@ defmodule Fermo.Live.App do
   alias Fermo.Live.{
     AssetPipeline,
     Dependencies,
-    LibChangeHandler,
+    ChangeHandler,
     Server,
     Socket,
     SocketRegistry,
-    TemplateChangeHandler,
     Watcher
   }
 
   @assets Application.compile_env(:fermo, :assets, [])
   @code_watchers [
-    [dir: "lib", notify: LibChangeHandler],
-    [dir: "priv/source", notify: TemplateChangeHandler]
+    [dir: "lib", notify: ChangeHandler.Lib],
+    [dir: "priv/source", notify: ChangeHandler.Template]
   ]
 
   def start(_type, _args) do
@@ -68,13 +67,13 @@ defmodule Fermo.Live.App do
   end
 
   defp live_asset_pipelines() do
-    Application.get_env(:fermo, :live_asset_pipelines, [])
+    :fermo
+    |> Application.get_env(:live_asset_pipelines, [])
     |> Enum.map(&{AssetPipeline, &1})
   end
 
   defp live_watchers do
-    (@code_watchers ++ asset_watchers())
-    |> Enum.map(&{Watcher, &1})
+    Enum.map(@code_watchers ++ asset_watchers(), &{Watcher, &1})
   end
 
   defp asset_watchers do

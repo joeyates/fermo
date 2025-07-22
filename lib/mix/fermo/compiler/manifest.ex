@@ -10,7 +10,7 @@ defmodule Mix.Fermo.Compiler.Manifest do
 
   def read do
     if File.exists?(path()) do
-      case File.read!(path()) |> :erlang.binary_to_term() do
+      case path() |> File.read!() |> :erlang.binary_to_term() do
         [@manifest_vsn | sources] -> sources
         _ -> MapSet.new({})
       end
@@ -24,6 +24,7 @@ defmodule Mix.Fermo.Compiler.Manifest do
     manifest_data =
       [@manifest_vsn | sources]
       |> :erlang.term_to_binary([:compressed])
+
     path = path()
     File.write!(path, manifest_data)
     File.touch!(path, timestamp)

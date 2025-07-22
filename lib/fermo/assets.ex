@@ -7,21 +7,21 @@ defmodule Fermo.Assets do
   use GenServer
 
   @asset_path Application.compile_env(
-    :fermo,
-    :asset_path,
-    "build"
-  )
+                :fermo,
+                :asset_path,
+                "build"
+              )
   @asset_extensions Application.compile_env(
-    :fermo,
-    :asset_extensions,
-    ~w(.css .ico .jpg .jpeg .js .png .txt)
-  )
+                      :fermo,
+                      :asset_extensions,
+                      ~w(.css .ico .jpg .jpeg .js .png .txt)
+                    )
   @digested_filename ~r(-[a-z0-9]{32}\.[a-z0-9]+$)
   @live_asset_base Application.compile_env(
-    :fermo,
-    :live_asset_base,
-    "/"
-  )
+                     :fermo,
+                     :live_asset_base,
+                     "/"
+                   )
   @name :fermo_assets
 
   def start_link(args \\ %{}) do
@@ -52,6 +52,7 @@ defmodule Fermo.Assets do
       |> Path.join("**")
       |> Path.wildcard()
       |> Enum.filter(&is_asset?/1)
+
     {:ok, files}
   end
 
@@ -73,11 +74,12 @@ defmodule Fermo.Assets do
       |> Enum.map(fn file ->
         relative_filename = Path.relative_to(file, @asset_path)
         content = File.read!(file)
-        digest = Base.encode16(:erlang.md5(content), case: :lower)
+        digest = content |> :erlang.md5() |> Base.encode16(case: :lower)
         extension = Path.extname(file)
         root = Path.rootname(file, extension)
         digested_filename = "#{root}-#{digest}#{extension}"
         relative_digested_filename = Path.relative_to(digested_filename, @asset_path)
+
         %{
           filename: file,
           relative_filename: relative_filename,
@@ -87,6 +89,7 @@ defmodule Fermo.Assets do
           extension: extension
         }
       end)
+
     {:ok, metadata}
   end
 
@@ -95,6 +98,7 @@ defmodule Fermo.Assets do
     |> Enum.each(fn item ->
       File.cp!(item.filename, item.digested_filename)
     end)
+
     {:ok}
   end
 
@@ -105,6 +109,7 @@ defmodule Fermo.Assets do
         {item.relative_filename, item}
       end)
       |> Enum.into(%{})
+
     {:ok, manifest}
   end
 
@@ -146,6 +151,7 @@ defmodule Fermo.Assets do
   defmacro asset_path(name) do
     quote do
       context = var!(context)
+
       if context[:page][:live] do
         live_asset_path(unquote(name))
       else
@@ -171,6 +177,7 @@ defmodule Fermo.Assets do
   def font_path("https://" <> _path = url) do
     url
   end
+
   def font_path(filename) do
     path!("/fonts/#{filename}")
   end
@@ -180,9 +187,11 @@ defmodule Fermo.Assets do
       static_image_path(unquote(url))
     end
   end
+
   defmacro image_path(name) do
     quote do
       context = var!(context)
+
       if context[:page][:live] do
         live_image_path(unquote(name))
       else
@@ -197,20 +206,24 @@ defmodule Fermo.Assets do
         image_tag_with_attributes(unquote(filename), unquote(attributes))
       else
         context = var!(context)
-        url = if context[:page][:live] do
-          live_image_path(unquote(filename))
-        else
-          static_image_path(unquote(filename))
-        end
+
+        url =
+          if context[:page][:live] do
+            live_image_path(unquote(filename))
+          else
+            static_image_path(unquote(filename))
+          end
+
         image_tag_with_attributes(url, unquote(attributes))
       end
     end
   end
 
   def image_tag_with_attributes(url, attributes) do
-    attribs = Enum.map(attributes, fn ({k, v}) ->
-      "#{k}=\"#{v}\""
-    end)
+    attribs =
+      Enum.map(attributes, fn {k, v} ->
+        "#{k}=\"#{v}\""
+      end)
 
     "<img src=\"#{url}\" #{Enum.join(attribs, " ")}/>"
   end
@@ -218,9 +231,11 @@ defmodule Fermo.Assets do
   def static_image_path("https://" <> _path = url) do
     url
   end
+
   def static_image_path("/" <> filename) do
     path!("/images/#{filename}")
   end
+
   def static_image_path(filename) do
     path!("/images/#{filename}")
   end
@@ -232,6 +247,7 @@ defmodule Fermo.Assets do
   defmacro javascript_path(name) do
     quote do
       context = var!(context)
+
       if context[:page][:live] do
         live_javascript_path(unquote(name))
       else
@@ -244,11 +260,14 @@ defmodule Fermo.Assets do
   defmacro javascript_include_tag(name) do
     quote do
       context = var!(context)
-      url = if context[:page][:live] do
-        live_javascript_path(unquote(name))
-      else
-        static_javascript_path(unquote(name))
-      end
+
+      url =
+        if context[:page][:live] do
+          live_javascript_path(unquote(name))
+        else
+          static_javascript_path(unquote(name))
+        end
+
       "<script src=\"#{url}\" type=\"text/javascript\"></script>"
     end
   end
@@ -256,6 +275,7 @@ defmodule Fermo.Assets do
   def static_javascript_path("https://" <> _path = url) do
     url
   end
+
   def static_javascript_path(name) do
     path!("/#{name}.js")
   end
@@ -267,6 +287,7 @@ defmodule Fermo.Assets do
   defmacro stylesheet_path(name) do
     quote do
       context = var!(context)
+
       if context[:page][:live] do
         live_stylesheet_path(unquote(name))
       else
@@ -278,11 +299,14 @@ defmodule Fermo.Assets do
   defmacro stylesheet_link_tag(name) do
     quote do
       context = var!(context)
-      url = if context[:page][:live] do
-        live_stylesheet_path(unquote(name))
-      else
-        static_stylesheet_path(unquote(name))
-      end
+
+      url =
+        if context[:page][:live] do
+          live_stylesheet_path(unquote(name))
+        else
+          static_stylesheet_path(unquote(name))
+        end
+
       "<link href=\"#{url}\" media=\"all\" rel=\"stylesheet\" />"
     end
   end
@@ -290,6 +314,7 @@ defmodule Fermo.Assets do
   def static_stylesheet_path("https://" <> _path = url) do
     url
   end
+
   def static_stylesheet_path(name) do
     path!("/#{name}.css")
   end

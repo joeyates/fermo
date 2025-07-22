@@ -1,5 +1,5 @@
 defmodule FakeFile.Stream do
-  defstruct path: nil
+  defstruct [:path]
 
   defimpl Collectable do
     def into(%FakeFile.Stream{path: path}) do
@@ -7,10 +7,14 @@ defmodule FakeFile.Stream do
         :ok,
         fn
           :ok, {:cont, text} ->
-            send self(), {:fake_file_stream, :into, path, text}
+            send(self(), {:fake_file_stream, :into, path, text})
             :ok
-          :ok, :done -> :ok
-          :ok, :halt -> :ok
+
+          :ok, :done ->
+            :ok
+
+          :ok, :halt ->
+            :ok
         end
       }
     end
@@ -23,6 +27,7 @@ end
 
 defmodule Fermo.SitemapTest do
   use ExUnit.Case, async: true
+
   import Mox
 
   alias Fermo.Sitemap
