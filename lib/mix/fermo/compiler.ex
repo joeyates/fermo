@@ -54,7 +54,8 @@ defmodule Mix.Fermo.Compiler do
 
   defp changed_since(types_and_paths, timestamp) do
     Enum.filter(types_and_paths, fn {_type, path} ->
-      @mix_utils.last_modified(path) > timestamp
+      last_modified = @mix_utils.last_modified(path)
+      last_modified > timestamp
     end)
   end
 
