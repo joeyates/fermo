@@ -11,6 +11,8 @@ defmodule Fermo.Live.ChangeHandler.Lib do
   @impl true
   def notify(_path) do
     Mix.Tasks.Compile.Elixir.run([])
+    # Without running `mix compile`, the module disappears from disk. Not clear why
+    System.shell("mix compile")
     recompile_templates()
     notify_lib_change()
   end
