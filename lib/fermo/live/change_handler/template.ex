@@ -1,9 +1,17 @@
-defmodule Fermo.Live.TemplateChangeHandler do
-  @moduledoc false
+defmodule Fermo.Live.ChangeHandler.Template do
+  @moduledoc """
+  A change handler for template files in a Fermo project.
+
+  When a template file changes, this module is notified by
+  a `Fermo.Live.Watcher` and it triggers a recompilation of the templates.
+  """
+
+  @behaviour Fermo.Live.ChangeHandler
 
   alias Fermo.Live.{Dependencies, SocketRegistry}
   alias Mix.Fermo.{Compiler, Paths}
 
+  @impl true
   def notify(path) do
     recompile_templates()
     app_relative_path = Paths.app_relative_path(path)
