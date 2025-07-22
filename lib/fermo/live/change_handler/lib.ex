@@ -6,6 +6,10 @@ defmodule Fermo.Live.ChangeHandler.Lib do
   and it triggers a recompilation of the Elixir code and reloads the live socket registry.
   """
 
+  alias Fermo.Live.Dependencies
+
+  require Logger
+
   @behaviour Fermo.Live.ChangeHandler
 
   @impl true
@@ -13,15 +17,8 @@ defmodule Fermo.Live.ChangeHandler.Lib do
     Mix.Tasks.Compile.Elixir.run([])
     # Without running `mix compile`, the module disappears from disk. Not clear why
     System.shell("mix compile")
-    recompile_templates()
-    notify_lib_change()
-  end
-
-  defp recompile_templates() do
-    :ok = Mix.Fermo.Compiler.run()
-  end
-
-  defp notify_lib_change() do
+    Dependencies.reinitialize()
+    Logger.debug("Forcing reload of all connected clients...")
     {:ok} = Fermo.Live.SocketRegistry.reload()
   end
 end
