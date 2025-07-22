@@ -41,6 +41,7 @@ defmodule Fermo.Live.Dependencies do
 
   @impl true
   def handle_call({:reinitialize}, _from, %{app_module: app_module} = state) do
+    Logger.debug("Reinitializing Fermo dependencies...")
     config = load_config(app_module)
     {:reply, {:ok}, Map.put(state, :config, config)}
   end

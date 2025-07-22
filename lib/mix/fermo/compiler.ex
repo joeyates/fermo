@@ -16,6 +16,7 @@ defmodule Mix.Fermo.Compiler do
   @mix_utils Application.compile_env(:fermo, :mix_utils, Mix.Utils)
 
   def run do
+    Logger.debug("Fermo.Compiler running...")
     :yamerl_app.set_param(:node_mods, [])
     compilation_timestamp = compilation_timestamp()
     ensure_helpers_module()

@@ -13,7 +13,9 @@ defmodule Fermo.Live.ChangeHandler.Lib do
   @behaviour Fermo.Live.ChangeHandler
 
   @impl true
-  def notify(_path) do
+  def notify(path) do
+    Logger.debug("Fermo.Live.ChangeHandler.Lib notified of change in '#{path}'")
+    Logger.debug("Recompiling Elixir code...")
     Mix.Tasks.Compile.Elixir.run([])
     # Without running `mix compile`, the module disappears from disk. Not clear why
     System.shell("mix compile")
