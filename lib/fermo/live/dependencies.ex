@@ -47,6 +47,7 @@ defmodule Fermo.Live.Dependencies do
 
   def handle_call({:page_from_path, path}, _from, state) do
     page = Enum.find(state.config.pages, &(&1.path == path))
+
     if page do
       {:reply, {:ok, page}, state}
     else
@@ -55,53 +56,66 @@ defmodule Fermo.Live.Dependencies do
   end
 
   def handle_call({:pages_by_dependency, value}, _from, state) do
-    pages = Enum.filter(state.config.pages, fn page ->
-      Enum.member?(page.dependencies, value)
-    end)
+    pages =
+      Enum.filter(state.config.pages, fn page ->
+        Enum.member?(page.dependencies, value)
+      end)
+
     {:reply, {:ok, pages}, state}
   end
 
   def handle_call({:start_page, path}, _from, state) do
-    state = state
-    |> update_page(path, &(reset_page_dependencies(&1)))
+    state =
+      update_page(
+        state,
+        path,
+        &reset_page_dependencies(&1)
+      )
 
     {:reply, {:ok}, state}
   end
 
   def handle_call({:add_page_dependency, path, value}, _from, state) do
-    state = update_page(state, path, fn page ->
-      dependencies = if Enum.member?(page.dependencies, value) do
-        page.dependencies
-      else
-        [value | page.dependencies]
-      end
-      Map.put(page, :dependencies, dependencies)
-    end)
+    state =
+      update_page(state, path, fn page ->
+        dependencies =
+          if Enum.member?(page.dependencies, value) do
+            page.dependencies
+          else
+            [value | page.dependencies]
+          end
+
+        Map.put(page, :dependencies, dependencies)
+      end)
 
     {:reply, {:ok}, state}
   end
 
   defp load_config(app_module) do
-    Logger.info "Requesting #{app_module}.config... "
+    Logger.info("Requesting #{app_module}.config... ")
     {:ok, config} = app_module.config()
-    Logger.info "Done!"
-    Logger.info "Running post config... "
+    Logger.info("Done!")
+    Logger.info("Running post config... ")
+
     config =
       config
       |> @config.post_config()
       |> set_live_attributes()
-    Logger.info "Done!"
+
+    Logger.info("Done!")
     config
   end
 
   defp set_live_attributes(config) do
     fermo_live = Application.get_env(:fermo, :live, [])
     pages_live = Keyword.get(fermo_live, :pages, true)
-    pages = Enum.map(config.pages, fn page ->
-      page
-      |> Map.put(:live, pages_live)
-      |> reset_page_dependencies()
-    end)
+
+    pages =
+      Enum.map(config.pages, fn page ->
+        page
+        |> Map.put(:live, pages_live)
+        |> reset_page_dependencies()
+      end)
 
     config
     |> put_in([:pages], pages)
@@ -113,17 +127,19 @@ defmodule Fermo.Live.Dependencies do
         "/" <> rest -> rest
         path -> path
       end
+
     Map.put(page, :dependencies, [template])
   end
 
   defp update_page(state, path, callback) do
-    pages = Enum.map(state.config.pages, fn page ->
-      if page.path == path do
-        callback.(page)
-      else
-        page
-      end
-    end)
+    pages =
+      Enum.map(state.config.pages, fn page ->
+        if page.path == path do
+          callback.(page)
+        else
+          page
+        end
+      end)
 
     put_in(state, [:config, :pages], pages)
   end

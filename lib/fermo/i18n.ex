@@ -5,11 +5,14 @@ defmodule Fermo.I18n do
   @callback load(String.t()) :: {:ok}
   def load(path \\ "priv/locales/**/*.yml") do
     files = Path.wildcard(path)
-    translations = Enum.reduce(files, %{}, fn (file, translations) ->
-      content = YamlElixir.read_from_file(file)
-      {:ok, atom_keys} = Morphix.atomorphiform(content)
-      DeepMerge.deep_merge(translations, atom_keys)
-    end)
+
+    translations =
+      Enum.reduce(files, %{}, fn file, translations ->
+        content = YamlElixir.read_from_file(file)
+        {:ok, atom_keys} = Morphix.atomorphiform(content)
+        DeepMerge.deep_merge(translations, atom_keys)
+      end)
+
     {:ok} = I18n.put(translations)
   end
 
@@ -40,50 +43,56 @@ defmodule Fermo.I18n do
   """
   @callback optionally_build_path_map(map()) :: map()
   def optionally_build_path_map(%{i18n: nil} = config), do: config
+
   def optionally_build_path_map(%{localized_paths: true, i18n: _i18n} = config) do
-    pages_with_locale_and_id = Enum.filter(
-      config.pages,
-      fn %{params: params} ->
-        Map.has_key?(params, :locale) && Map.has_key?(params, :id)
-      end
-    )
-
-    path_locale_id = Enum.map(
-      pages_with_locale_and_id,
-      fn page ->
-        %{path: page.path, id: page.params.id, locale: atom(page.params.locale)}
-      end
-    )
-
-    by_id = Enum.group_by(path_locale_id, &(&1.id))
-
-    path_map = Enum.into(
-      by_id,
-      %{},
-      fn {id, pages} ->
-        {
-          id,
-          Enum.into(pages, %{}, fn item -> {item.locale, item.path} end)
-        }
-      end
-    )
-
-    pages = Enum.map(
-      config.pages,
-      fn %{params: params} = page ->
-        if Map.has_key?(params, :locale) && Map.has_key?(params, :id) do
-          map = path_map[params.id]
-          put_in(page, [:localized_paths], map)
-        else
-          page
+    pages_with_locale_and_id =
+      Enum.filter(
+        config.pages,
+        fn %{params: params} ->
+          Map.has_key?(params, :locale) && Map.has_key?(params, :id)
         end
-      end
-    )
+      )
+
+    path_locale_id =
+      Enum.map(
+        pages_with_locale_and_id,
+        fn page ->
+          %{path: page.path, id: page.params.id, locale: atom(page.params.locale)}
+        end
+      )
+
+    by_id = Enum.group_by(path_locale_id, & &1.id)
+
+    path_map =
+      Enum.into(
+        by_id,
+        %{},
+        fn {id, pages} ->
+          {
+            id,
+            Enum.into(pages, %{}, fn item -> {item.locale, item.path} end)
+          }
+        end
+      )
+
+    pages =
+      Enum.map(
+        config.pages,
+        fn %{params: params} = page ->
+          if Map.has_key?(params, :locale) && Map.has_key?(params, :id) do
+            map = path_map[params.id]
+            put_in(page, [:localized_paths], map)
+          else
+            page
+          end
+        end
+      )
 
     config
     |> put_in([:pages], pages)
-    |> put_in([:stats, :optionally_build_path_map_completed], Time.utc_now)
+    |> put_in([:stats, :optionally_build_path_map_completed], Time.utc_now())
   end
+
   def optionally_build_path_map(%{path_map: true} = config) do
     Logger.warning("""
     `config.path_map` is deprecated.
@@ -91,16 +100,20 @@ defmodule Fermo.I18n do
     Set `config.localized_paths: true` in order to get a per-page Map
     of localized pages.
     """)
-    optionally_build_path_map(Map.put(config, :localized_paths, true))
+
+    config |> Map.put(:localized_paths, true) |> optionally_build_path_map()
   end
+
   def optionally_build_path_map(config), do: config
 
   def root_locale(config) do
     no_root_locale = Map.get(config, :no_root_locale, false)
+
     if no_root_locale do
       nil
     else
       default_locale = default_locale(config)
+
       if default_locale do
         default_locale
       else

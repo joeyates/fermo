@@ -1,7 +1,6 @@
 defmodule Fermo.Assets.ESBuild do
   if Application.spec(:esbuild) do
     require Esbuild
-
     @behaviour Fermo.Assets.Builder
 
     def build() do

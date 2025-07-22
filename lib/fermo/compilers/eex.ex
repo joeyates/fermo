@@ -20,17 +20,15 @@ defmodule Fermo.Compilers.EEx do
     source = File.read!(template_project_path)
     [frontmatter, body] = extract_frontmatter(source)
 
-    compile_module(
-      %__MODULE__{
-        name: name,
-        source: body,
-        frontmatter: frontmatter,
-        content_fors: [],
-        template_project_path: template_project_path,
-        template_source_path: template_source_path,
-        offset: 0
-      }
-    )
+    compile_module(%__MODULE__{
+      name: name,
+      source: body,
+      frontmatter: frontmatter,
+      content_fors: [],
+      template_project_path: template_project_path,
+      template_source_path: template_source_path,
+      offset: 0
+    })
   end
 
   def extract_frontmatter(source = "---\n" <> _rest) do
@@ -38,6 +36,7 @@ defmodule Fermo.Compilers.EEx do
     frontmatter = YamlElixir.read_from_string(frontmatter_yaml)
     [frontmatter, body]
   end
+
   def extract_frontmatter(body) do
     [%{}, body]
   end
@@ -53,75 +52,81 @@ defmodule Fermo.Compilers.EEx do
         Template compilation error: #{e.description}
         Path: '#{module.template_project_path}'
         """
+
         raise Fermo.Error, message: message
     end
 
-    quoted_module = quote(
-      bind_quoted: [
-        content_fors: module.content_fors,
-        frontmatter: Macro.escape(module.frontmatter, unquote: true),
-        name: module.name,
-        offset: module.offset,
-        source: module.source,
-        template_project_path: module.template_project_path,
-        template_source_path: module.template_source_path
-      ],
-      file: module.template_project_path
-    ) do
-      compiled = EEx.compile_string(source, line: offset, file: template_project_path)
+    quoted_module =
+      quote(
+        bind_quoted: [
+          content_fors: module.content_fors,
+          frontmatter: Macro.escape(module.frontmatter, unquote: true),
+          name: module.name,
+          offset: module.offset,
+          source: module.source,
+          template_project_path: module.template_project_path,
+          template_source_path: module.template_source_path
+        ],
+        file: module.template_project_path
+      ) do
+        compiled = EEx.compile_string(source, line: offset, file: template_project_path)
 
-      cfs_compiled = Enum.map(content_fors, fn [key, eex, offset] ->
-        cf_compiled = EEx.compile_string(eex, line: offset, file: template_project_path)
-        {key, cf_compiled}
-      end)
+        cfs_compiled =
+          Enum.map(content_fors, fn [key, eex, offset] ->
+            cf_compiled = EEx.compile_string(eex, line: offset, file: template_project_path)
+            {key, cf_compiled}
+          end)
 
-      defmodule :"#{name}" do
-        use Helpers
-        require Fermo.Partial
-        import Fermo.Partial
-        require Fermo.YieldContent
-        import Fermo.YieldContent
-        require Fermo.Assets
-        import Fermo.Assets
-        import Fermo.I18n
+        defmodule :"#{name}" do
+          use Helpers
 
-        Enum.map(cfs_compiled, fn {key, cf_compiled} ->
-          args = [:"#{key}", Macro.var(:params, nil), Macro.var(:context, nil)]
+          import Fermo.Partial
+          import Fermo.YieldContent
+          import Fermo.Assets
+          import Fermo.I18n
 
-          def content_for(unquote_splicing(args)) do
+          require Fermo.Partial
+          require Fermo.YieldContent
+          require Fermo.Assets
+
+          Enum.map(cfs_compiled, fn {key, cf_compiled} ->
+            args = [:"#{key}", Macro.var(:params, nil), Macro.var(:context, nil)]
+
+            def content_for(unquote_splicing(args)) do
+              _params = var!(params)
+              _context = var!(context)
+              unquote(cf_compiled)
+            end
+          end)
+
+          # TODO: Shouldn't this return nil?
+          # TODO: if we change this to return nil,
+          #   we need to update set_paths/1
+          def content_for(key, params, context) do
+            ""
+          end
+
+          def template_source_path() do
+            unquote(template_source_path)
+          end
+
+          # Define a method with the frontmatter, so we can merge with
+          # params when the template is evaluated
+          escaped_frontmatter = Macro.escape(frontmatter)
+
+          def defaults() do
+            unquote(escaped_frontmatter)
+          end
+
+          args = [Macro.var(:params, nil), Macro.var(:context, nil)]
+
+          def call(unquote_splicing(args)) do
             _params = var!(params)
             _context = var!(context)
-            unquote(cf_compiled)
+            unquote(compiled)
           end
-        end)
-
-        # TODO: Shouldn't this return nil?
-        # TODO: if we change this to return nil,
-        #   we need to update set_paths/1
-        def content_for(key, params, context) do
-          ""
-        end
-
-        def template_source_path() do
-          unquote(template_source_path)
-        end
-
-        # Define a method with the frontmatter, so we can merge with
-        # params when the template is evaluated
-        escaped_frontmatter = Macro.escape(frontmatter)
-
-        def defaults() do
-          unquote(escaped_frontmatter)
-        end
-
-        args = [Macro.var(:params, nil), Macro.var(:context, nil)]
-        def call(unquote_splicing(args)) do
-          _params = var!(params)
-          _context = var!(context)
-          unquote(compiled)
         end
       end
-    end
 
     Code.compiler_options(ignore_module_conflict: true)
     [{module_name, bytecode} | _other] = Code.compile_quoted(quoted_module)

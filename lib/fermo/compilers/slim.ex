@@ -1,6 +1,7 @@
 defmodule Fermo.Compilers.Slim do
   import Mix.Fermo.Paths
   import Fermo.Naming
+
   alias Fermo.Compilers.EEx
 
   @file_impl Application.compile_env(:fermo, :file_impl, File)
@@ -15,22 +16,21 @@ defmodule Fermo.Compilers.Slim do
 
     eex_source = precompile_slim(body, template_project_path)
 
-    cfs_eex = Enum.map(content_fors, fn [key, block, offset] ->
-      eex = precompile_slim(block, template_project_path, "content_for(:#{key})")
-      [key, eex, offset]
-    end)
+    cfs_eex =
+      Enum.map(content_fors, fn [key, block, offset] ->
+        eex = precompile_slim(block, template_project_path, "content_for(:#{key})")
+        [key, eex, offset]
+      end)
 
-    EEx.compile_module(
-      %EEx{
-        name: name,
-        source: eex_source,
-        frontmatter: frontmatter,
-        content_fors: cfs_eex,
-        template_project_path: template_project_path,
-        template_source_path: template_source_path,
-        offset: offset
-      }
-    )
+    EEx.compile_module(%EEx{
+      name: name,
+      source: eex_source,
+      frontmatter: frontmatter,
+      content_fors: cfs_eex,
+      template_project_path: template_project_path,
+      template_source_path: template_source_path,
+      offset: offset
+    })
 
     {:ok}
   end
@@ -41,6 +41,7 @@ defmodule Fermo.Compilers.Slim do
     rescue
       e in Slime.TemplateSyntaxError ->
         line = e.line_number
+
         message = """
         SLIM template error: #{e.message}
         Template type: #{type}
@@ -48,6 +49,7 @@ defmodule Fermo.Compilers.Slim do
 
         #{body}
         """
+
         raise Fermo.Error, message: message
     end
   end
@@ -67,10 +69,13 @@ defmodule Fermo.Compilers.Slim do
 
   defp extract_content_for_blocks(body) do
     [head | parts] = String.split(body, ~r{(?<=\n|^)- content_for(?=(\s+\:\w+|\(\:\w+\))\n)})
-    {content_fors, offset, cleaned_parts} = Enum.reduce(parts, {[], 0, []}, fn (part, {cfs, offset, ps}) ->
-      {new_cf, lines, cleaned} = extract_content_for_block(part, offset)
-      {cfs ++ [new_cf], offset + lines, ps ++ cleaned}
-    end)
+
+    {content_fors, offset, cleaned_parts} =
+      Enum.reduce(parts, {[], 0, []}, fn part, {cfs, offset, ps} ->
+        {new_cf, lines, cleaned} = extract_content_for_block(part, offset)
+        {cfs ++ [new_cf], offset + lines, ps ++ cleaned}
+      end)
+
     {content_fors, offset, Enum.join([head] ++ cleaned_parts, "\n")}
   end
 
@@ -78,7 +83,11 @@ defmodule Fermo.Compilers.Slim do
     # Extract the content_for block (until the next line that isn't indented)
     # TODO: the block should not stop at the first non-indented **empty** line,
     #   it should continue to the first non-indented line with text
-    [key | [block | cleaned]] = Regex.run(~r/^(?:[\(\s]\:)([^\n\)]+)\)?\n((?:\s{2}[^\n]+\n)+)(.*)/s, part, capture: :all_but_first)
+    [key | [block | cleaned]] =
+      Regex.run(~r/^(?:[\(\s]\:)([^\n\)]+)\)?\n((?:\s{2}[^\n]+\n)+)(.*)/s, part,
+        capture: :all_but_first
+      )
+
     lines = count_lines(block) + 1
     # Strip leading blank lines
     block = String.replace(block, ~r/^[\s\r\n]*/, "", global: false)
@@ -90,5 +99,5 @@ defmodule Fermo.Compilers.Slim do
     {[key, block, offset], lines, cleaned}
   end
 
-  defp count_lines(text), do: length(String.split(text, "\n"))
+  defp count_lines(text), do: text |> String.split("\n") |> length()
 end

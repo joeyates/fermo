@@ -18,13 +18,16 @@ defmodule Fermo.Compilers do
 
   @callback templates(Pathname.t()) :: [{atom(), Pathname.t()}]
   def templates(source_path) do
-    template_extensions()
-    |> Enum.flat_map(fn extension ->
-      files =
-        @mix_utils.extract_files([source_path], [extension])
-        |> MapSet.new()
-        |> MapSet.to_list()
-      Enum.map(files, &({extension, &1}))
-    end)
+    Enum.flat_map(
+      template_extensions(),
+      fn extension ->
+        files =
+          @mix_utils.extract_files([source_path], [extension])
+          |> MapSet.new()
+          |> MapSet.to_list()
+
+        Enum.map(files, &{extension, &1})
+      end
+    )
   end
 end

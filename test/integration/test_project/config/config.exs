@@ -7,6 +7,6 @@ config :fermo, :base_url, System.fetch_env!("BASE_URL")
 
 environment_config = "#{Mix.env()}.exs"
 
-if File.regular?(Path.join("config", environment_config)) do
+if "config" |> Path.join(environment_config) |> File.regular?() do
   import_config environment_config
 end

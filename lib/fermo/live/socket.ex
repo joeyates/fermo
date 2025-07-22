@@ -12,6 +12,7 @@ defmodule Fermo.Live.Socket do
   def websocket_info({:reload}, state) do
     {:reply, {:text, "reload"}, state}
   end
+
   def websocket_info(_info, state) do
     {:ok, state}
   end
@@ -21,6 +22,7 @@ defmodule Fermo.Live.Socket do
 
     {:reply, {:text, "fermo:live-reload subscribed for '#{path}'"}, state}
   end
+
   def websocket_handle(_info, state) do
     {:ok, state}
   end

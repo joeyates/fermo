@@ -67,13 +67,13 @@ defmodule Fermo.Live.App do
   end
 
   defp live_asset_pipelines() do
-    Application.get_env(:fermo, :live_asset_pipelines, [])
+    :fermo
+    |> Application.get_env(:live_asset_pipelines, [])
     |> Enum.map(&{AssetPipeline, &1})
   end
 
   defp live_watchers do
-    (@code_watchers ++ asset_watchers())
-    |> Enum.map(&{Watcher, &1})
+    Enum.map(@code_watchers ++ asset_watchers(), &{Watcher, &1})
   end
 
   defp asset_watchers do

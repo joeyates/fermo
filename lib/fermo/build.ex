@@ -21,11 +21,12 @@ defmodule Fermo.Build do
     config =
       config
       |> Map.put_new(:stats, %{})
-      |> put_in([:stats, :build_started], Time.utc_now)
+      |> put_in([:stats, :build_started], Time.utc_now())
 
     {:ok} = Fermo.I18n.load()
+
     if Enum.any?(@assets) do
-      Enum.each(@assets, &(&1.build()))
+      Enum.each(@assets, & &1.build())
       Fermo.Assets.create_manifest()
     end
 
@@ -35,13 +36,14 @@ defmodule Fermo.Build do
       |> copy_statics()
       |> @sitemap.build()
 
-    Task.async_stream(
-      config.pages,
-      &(render_cache_and_save(&1)),
-      [timeout: :infinity]
-    ) |> Enum.to_list
+    config.pages
+    |> Task.async_stream(
+      &render_cache_and_save(&1),
+      timeout: :infinity
+    )
+    |> Enum.to_list()
 
-    config = put_in(config, [:stats, :build_completed], Time.utc_now)
+    config = put_in(config, [:stats, :build_completed], Time.utc_now())
 
     {:ok, config}
   end
@@ -59,24 +61,27 @@ defmodule Fermo.Build do
   defp copy_statics(config) do
     statics = Map.get(config, :statics, [])
     build_path = config.build_path
-    Enum.each(statics, fn (%{source: source, filename: filename}) ->
+
+    Enum.each(statics, fn %{source: source, filename: filename} ->
       source_pathname = Path.join(source_path(), source)
       destination_pathname = Path.join(build_path, filename)
       @ffile.copy(source_pathname, destination_pathname)
     end)
-    put_in(config, [:stats, :copy_statics_completed], Time.utc_now)
+
+    put_in(config, [:stats, :copy_statics_completed], Time.utc_now())
   end
 
   defp render_cache_and_save(page) do
     with {:ok, hash} <- cache_key(page),
-      {:ok, cache_pathname} <- cached_page_path(hash),
-      {:ok} <- is_cached?(cache_pathname) do
+         {:ok, cache_pathname} <- cached_page_path(hash),
+         {:ok} <- is_cached?(cache_pathname) do
       @ffile.copy(cache_pathname, page.pathname)
     else
       {:build_and_cache, cache_pathname} ->
         body = render_page(page)
         @ffile.save(cache_pathname, body)
         @ffile.save(page.pathname, body)
+
       {:no_key} ->
         body = render_page(page)
         @ffile.save(page.pathname, body)
@@ -84,10 +89,12 @@ defmodule Fermo.Build do
   end
 
   defp cache_key(%{params: %{surrogate_key: nil}}), do: {:no_key}
+
   defp cache_key(%{params: %{surrogate_key: surrogate_key}}) do
-    hash = :crypto.hash(:sha256, surrogate_key) |> Base.encode16
+    hash = :sha256 |> :crypto.hash(surrogate_key) |> Base.encode16()
     {:ok, hash}
   end
+
   defp cache_key(_page), do: {:no_key}
 
   defp cached_page_path(hash) do

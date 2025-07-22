@@ -12,7 +12,7 @@ defmodule Fermo do
       require Fermo
 
       @before_compile Fermo
-      Module.register_attribute __MODULE__, :config, persist: true
+      Module.register_attribute(__MODULE__, :config, persist: true)
       @config unquote(opts)
 
       import I18n
@@ -23,8 +23,7 @@ defmodule Fermo do
   defmacro __before_compile__(_env) do
     quote do
       def initial_config() do
-        hd(__MODULE__.__info__(:attributes)[:config])
-        |> Fermo.Config.initial()
+        Fermo.Config.initial(hd(__MODULE__.__info__(:attributes)[:config]))
       end
     end
   end

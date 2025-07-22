@@ -43,9 +43,9 @@ defmodule Fermo.I18nTest do
     end
 
     @tag pages: [
-      %{path: "/foo", params: %{locale: "en", id: 1}},
-      %{path: "/it/foo", params: %{locale: :it, id: 1}}
-    ]
+           %{path: "/foo", params: %{locale: "en", id: 1}},
+           %{path: "/it/foo", params: %{locale: :it, id: 1}}
+         ]
     test "when locales are strings, it handles them", context do
       config = Fermo.I18n.optionally_build_path_map(context.config)
 

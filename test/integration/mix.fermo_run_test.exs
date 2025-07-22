@@ -32,28 +32,28 @@ defmodule Mix.FermoRunTest do
   end
 
   test "it builds dynamic pages", context do
-    assert File.regular?(Path.join(context.build_path, "index.html"))
+    context.build_path |> Path.join("index.html") |> File.regular?() |> assert()
   end
 
   test "it builds simple pages", context do
-    assert File.regular?(Path.join(context.build_path, "simple/index.html"))
+    context.build_path |> Path.join("simple/index.html") |> File.regular?() |> assert()
   end
 
   test "it builds localized pages", context do
-    assert File.regular?(Path.join(context.build_path, "local/index.html"))
-    assert File.regular?(Path.join(context.build_path, "it/local/index.html"))
+    context.build_path |> Path.join("local/index.html") |> File.regular?() |> assert()
+    context.build_path |> Path.join("it/local/index.html") |> File.regular?() |> assert()
   end
 
   test "it builds pagination", context do
-    assert File.regular?(Path.join(context.build_path, "foos/index.html"))
-    assert File.regular?(Path.join(context.build_path, "foos/pages/2.html"))
+    context.build_path |> Path.join("foos/index.html") |> File.regular?() |> assert()
+    context.build_path |> Path.join("foos/pages/2.html") |> File.regular?() |> assert()
   end
 
   test "it builds assets", context do
-    assert File.regular?(Path.join(context.build_path, "manifest.json"))
+    context.build_path |> Path.join("manifest.json") |> File.regular?() |> assert()
   end
 
   test "it builds the sitemap", context do
-    assert File.regular?(Path.join(context.build_path, "sitemap.xml"))
+    context.build_path |> Path.join("sitemap.xml") |> File.regular?() |> assert()
   end
 end

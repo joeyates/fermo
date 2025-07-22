@@ -8,6 +8,7 @@ end
 
 defmodule Fermo.Live.DependenciesTest do
   use ExUnit.Case, async: true
+
   import Mox
 
   alias Fermo.Live.Dependencies

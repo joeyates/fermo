@@ -18,24 +18,25 @@ defmodule Fermo.Config do
     |> @localizable.add()
     |> @simple.add()
     |> put_in([:stats], %{})
-    |> put_in([:stats, :start], Time.utc_now)
+    |> put_in([:stats, :start], Time.utc_now())
   end
 
   @callback post_config(map()) :: map()
   def post_config(config) do
-    pages = Enum.map(
-      config.pages,
-      fn page ->
-        page
-        |> set_path(config)
-        |> merge_defaults(config)
-      end
-    )
+    pages =
+      Enum.map(
+        config.pages,
+        fn page ->
+          page
+          |> set_path(config)
+          |> merge_defaults(config)
+        end
+      )
 
     config
     |> put_in([:pages], pages)
     |> @i18n.optionally_build_path_map()
-    |> put_in([:stats, :post_config_completed], Time.utc_now)
+    |> put_in([:stats, :post_config_completed], Time.utc_now())
   end
 
   def add_page(config, template, filename, params \\ %{}) do
@@ -81,18 +82,19 @@ defmodule Fermo.Config do
     path_override = @template.content_for(module, [:path, params, context])
     is_html = String.match?(template, ~r(\.html.\w+))
     # This depends on the default content_for returning "" and not nil
-    {filename, path} = if path_override == "" do
-      {
-        Fermo.Paths.path_to_filename(supplied_filename, as_index_html: is_html),
-        Fermo.Paths.filename_to_path(supplied_filename, as_index_html: is_html)
-      }
-    else
-      {
-        Fermo.Paths.path_to_filename(path_override, as_index_html: is_html),
-        # Avoid extra whitespace introduced by templating
-        String.replace(path_override, ~r/\n/, "")
-      }
-    end
+    {filename, path} =
+      if path_override == "" do
+        {
+          Fermo.Paths.path_to_filename(supplied_filename, as_index_html: is_html),
+          Fermo.Paths.filename_to_path(supplied_filename, as_index_html: is_html)
+        }
+      else
+        {
+          Fermo.Paths.path_to_filename(path_override, as_index_html: is_html),
+          # Avoid extra whitespace introduced by templating
+          String.replace(path_override, ~r/\n/, "")
+        }
+      end
 
     pathname = Path.join(config.build_path, filename)
 
@@ -110,16 +112,20 @@ defmodule Fermo.Config do
     module = @template.module_for_template(template)
     defaults = @template.defaults_for(module)
 
-    layout = cond do
-      Map.has_key?(page.params, :layout) ->
-        optionally_add_extensions(page.params.layout)
-      Map.has_key?(defaults, :layout) ->
-        optionally_add_extensions(defaults.layout)
-      Map.has_key?(config, :layout) ->
-        optionally_add_extensions(config.layout)
-      true ->
-        "layouts/layout.html.slim"
-    end
+    layout =
+      cond do
+        Map.has_key?(page.params, :layout) ->
+          optionally_add_extensions(page.params.layout)
+
+        Map.has_key?(defaults, :layout) ->
+          optionally_add_extensions(defaults.layout)
+
+        Map.has_key?(config, :layout) ->
+          optionally_add_extensions(config.layout)
+
+        true ->
+          "layouts/layout.html.slim"
+      end
 
     params =
       defaults

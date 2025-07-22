@@ -4,10 +4,13 @@ defmodule Fermo.MiddlemanImporter do
   def run(args) do
     {source, destination} = parse_args(args)
     ensure_directory(destination)
+
     sources =
-      sources(source)
+      source
+      |> sources()
       |> to_relative(source)
-    Enum.each(sources, &(import_slim(&1, source, destination)))
+
+    Enum.each(sources, &import_slim(&1, source, destination))
   end
 
   defp parse_args(args) do
@@ -36,7 +39,7 @@ defmodule Fermo.MiddlemanImporter do
   end
 
   defp to_relative(sources, source) do
-    Enum.map(sources, &(Path.relative_to(&1, source)))
+    Enum.map(sources, &Path.relative_to(&1, source))
   end
 
   defp import_slim(pathname, source, destination) do

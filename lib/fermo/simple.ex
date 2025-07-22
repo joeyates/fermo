@@ -17,22 +17,27 @@ defmodule Fermo.Simple do
   @callback add(map()) :: map()
   def add(config) do
     exclude = Map.get(config, :exclude, []) ++ ["partials/*"]
-    exclude_matchers = Enum.map(exclude, fn (glob) ->
-      single = String.replace(glob, "?", ".")
-      multiple = String.replace(single, "*", ".*")
-      Regex.compile!(multiple)
-    end)
+
+    exclude_matchers =
+      Enum.map(exclude, fn glob ->
+        single = String.replace(glob, "?", ".")
+        multiple = String.replace(single, "*", ".*")
+        Regex.compile!(multiple)
+      end)
 
     extensions_and_paths =
-      templates(@source_path)
+      @source_path
+      |> templates()
       |> Enum.map(fn {extension, path} ->
         {extension, Path.relative_to(path, @source_path)}
       end)
 
-    Enum.reduce(extensions_and_paths, config, fn ({extension, template}, config) ->
-      skip = Enum.any?(exclude_matchers, fn (exclude) ->
-        Regex.match?(exclude, template)
-      end)
+    Enum.reduce(extensions_and_paths, config, fn {extension, template}, config ->
+      skip =
+        Enum.any?(exclude_matchers, fn exclude ->
+          Regex.match?(exclude, template)
+        end)
+
       if skip do
         config
       else

@@ -1,14 +1,18 @@
 defmodule Mix.Fermo.Compiler do
   @moduledoc false
 
-  require Logger
-
   alias Mix.Fermo.Paths
+
+  require Logger
 
   # Implementations for testing
   @compilers Application.compile_env(:fermo, :compilers, Fermo.Compilers)
   @file_impl Application.compile_env(:fermo, :file_impl, File)
-  @mix_compiler_manifest Application.compile_env(:fermo, :mix_compiler_manifest, Mix.Fermo.Compiler.Manifest)
+  @mix_compiler_manifest Application.compile_env(
+                           :fermo,
+                           :mix_compiler_manifest,
+                           Mix.Fermo.Compiler.Manifest
+                         )
   @mix_utils Application.compile_env(:fermo, :mix_utils, Mix.Utils)
 
   def run do
@@ -19,22 +23,27 @@ defmodule Mix.Fermo.Compiler do
     all_sources = @compilers.templates(Paths.full_source_path())
     timestamp = @mix_compiler_manifest.timestamp()
     helpers_changed = helpers_changed?(timestamp)
-    changed = if helpers_changed do
-      all_sources
-    else
-      changed_since(all_sources, timestamp)
-    end
+
+    changed =
+      if helpers_changed do
+        all_sources
+      else
+        changed_since(all_sources, timestamp)
+      end
 
     count = length(changed)
+
     if count > 0 do
-      Logger.info "Fermo.Compiler compiling #{count} file(s)... "
+      Logger.info("Fermo.Compiler compiling #{count} file(s)... ")
       compilers = @compilers.compilers()
+
       Enum.each(changed, fn {type, template_project_path} ->
-        Logger.info "Compiling #{template_project_path} with #{type} compiler"
+        Logger.info("Compiling #{template_project_path} with #{type} compiler")
         compiler = compilers[type]
         compiler.compile(template_project_path)
       end)
-      Logger.info "Done!"
+
+      Logger.info("Done!")
     end
 
     {:ok} = @mix_compiler_manifest.write(all_sources, compilation_timestamp)
@@ -57,8 +66,13 @@ defmodule Mix.Fermo.Compiler do
   def ensure_helpers_module do
     Code.ensure_loaded(helpers_module())
     has_helpers = has_helpers?()
+
     if !has_helpers do
-      [{module, bytecode}] = Code.compile_string("defmodule #{helpers_module()} do; defmacro __using__(_opts \\\\ %{}) do; end; end")
+      [{module, bytecode}] =
+        Code.compile_string(
+          "defmodule #{helpers_module()} do; defmacro __using__(_opts \\\\ %{}) do; end; end"
+        )
+
       base = Mix.Project.compile_path()
       module_path = Path.join(base, "#{module}.beam")
       @file_impl.write!(module_path, bytecode, [:write])

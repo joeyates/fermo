@@ -1,8 +1,8 @@
 defmodule Fermo.Live.Server do
-  require Logger
-
   import Plug.Conn
   import Mix.Fermo.Paths, only: [app_path: 0]
+
+  require Logger
 
   live_reload_js_path = Application.app_dir(:fermo, "priv/static/fermo-live.js.eex")
   @external_resource live_reload_js_path
@@ -21,7 +21,7 @@ defmodule Fermo.Live.Server do
   end
 
   def call(conn, _state) do
-    request_path(conn) |> handle_request_path(conn)
+    conn |> request_path() |> handle_request_path(conn)
   end
 
   defp handle_request_path({:error, :request_path_missing}, conn) do
@@ -132,7 +132,8 @@ defmodule Fermo.Live.Server do
   end
 
   defp build_root do
-    Path.join(app_path(), "build")
+    app_path()
+    |> Path.join("build")
     |> Path.expand()
   end
 

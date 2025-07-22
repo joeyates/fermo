@@ -1,6 +1,7 @@
 import Config
 
 env_config = "#{config_env()}.exs"
-if File.regular?(Path.join("config", env_config)) do
+
+if "config" |> Path.join(env_config) |> File.regular?() do
   import_config env_config
 end

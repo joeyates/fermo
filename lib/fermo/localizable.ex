@@ -13,12 +13,14 @@ defmodule Fermo.Localizable do
     config = put_in(config, [:exclude], exclude)
 
     extensions_and_paths =
-      templates(Path.join(@source_path, "localizable"))
+      @source_path
+      |> Path.join("localizable")
+      |> templates()
       |> Enum.map(fn {extension, path} ->
         {extension, Path.relative_to(path, @source_path)}
       end)
 
-    Enum.reduce(extensions_and_paths, config, fn ({extension, template}, config) ->
+    Enum.reduce(extensions_and_paths, config, fn {extension, template}, config ->
       is_html = String.ends_with?(template, ".html.#{extension}")
 
       filename =
@@ -26,15 +28,18 @@ defmodule Fermo.Localizable do
         |> String.replace_prefix("localizable/", "")
         |> Fermo.Paths.template_to_filename(as_index_html: is_html)
 
-      Enum.reduce(locales, config, fn (locale, config) ->
-        localized_filename = if locale == root_locale do
+      Enum.reduce(locales, config, fn locale, config ->
+        localized_filename =
+          if locale == root_locale do
             "/#{filename}"
           else
             "/#{locale}/#{filename}"
           end
+
         Fermo.Config.add_page!(config, template, localized_filename, %{locale: locale})
       end)
     end)
   end
+
   def add(config), do: config
 end
