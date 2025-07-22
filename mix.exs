@@ -61,6 +61,7 @@ defmodule Fermo.MixProject do
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:excoveralls, ">= 0.0.0", only: :test},
       {:file_system, ">= 0.0.0"},
+      {:green, "~> 0.1.4", only: [:dev]},
       {:jason, ">= 1.0.0"},
       {:morphix, ">= 0.0.0"},
       {:mox, ">= 0.0.0", only: :test, runtime: false},
