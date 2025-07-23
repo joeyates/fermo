@@ -4,17 +4,14 @@ defmodule Fermo.Live.Server do
 
   require Logger
 
-  live_reload_js_path = Application.app_dir(:fermo, "priv/static/fermo-live.js.eex")
+  live_reload_js_path = Application.app_dir(:fermo, "priv/static/fermo-live.js")
   @external_resource live_reload_js_path
 
-  @live_reload_js EEx.eval_string(
-                    """
-                    <script type="text/javascript">
-                    #{File.read!(live_reload_js_path)}
-                    </script>
-                    """,
-                    env: System.get_env()
-                  )
+  @live_reload_js """
+  <script type="text/javascript">
+  #{File.read!(live_reload_js_path)}
+  </script>
+  """
 
   def init(_options) do
     []

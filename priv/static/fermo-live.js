@@ -1,5 +1,5 @@
 const FERMO_LIVE_SOCKET = (location => {
-  const protocol = '<%= if env["FERMO_SECURE_WEBSOCKET"], do: "wss", else: "ws" %>'
+  const protocol = location.protocol == 'https:' ? 'wss' : 'ws'
   const socketPath = `${protocol}://${location.host}/__fermo/ws/live-reload`
   const socket = new window.WebSocket(socketPath)
   let pingTimer = null
