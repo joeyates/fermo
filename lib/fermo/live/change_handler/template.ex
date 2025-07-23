@@ -11,17 +11,25 @@ defmodule Fermo.Live.ChangeHandler.Template do
   alias Fermo.Live.{Dependencies, SocketRegistry}
   alias Mix.Fermo.{Compiler, Paths}
 
+  require Logger
+
   @impl true
   def notify(path) do
-    recompile_templates()
-    app_relative_path = Paths.app_relative_path(path)
+    app_relative_path =
+      path
+      |> Paths.app_relative_path()
+      |> template_relative_path()
 
-    app_relative_path
-    |> template_relative_path()
-    |> notify_template_change()
+    recompile(app_relative_path)
   end
 
-  defp recompile_templates() do
+  defp recompile(template_path) do
+    Logger.debug("#{__MODULE__} - Recompiling template: #{template_path}")
+    recompile_updated()
+    notify_template_change(template_path)
+  end
+
+  defp recompile_updated() do
     :ok = Compiler.run()
   end
 
