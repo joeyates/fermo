@@ -1,4 +1,6 @@
 const FERMO_LIVE_SOCKET = (location => {
+  const PING_INTERVAL = 10000 // 10 seconds
+
   const protocol = location.protocol == 'https:' ? 'wss' : 'ws'
   const socketPath = `${protocol}://${location.host}/__fermo/ws/live-reload`
   const socket = new window.WebSocket(socketPath)
@@ -13,7 +15,7 @@ const FERMO_LIVE_SOCKET = (location => {
     socket.send('subscribe:live-reload:' + window.location.pathname)
     pingTimer = window.setInterval(() => {
       socket.send(JSON.stringify({event: 'ping'}))
-    }, 10000)
+    }, PING_INTERVAL)
   }
 
   socket.onmessage = (event) => {
