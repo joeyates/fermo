@@ -10,6 +10,7 @@ defmodule Fermo.Live.Server do
   @live_reload_js """
   <script type="text/javascript">
   #{File.read!(live_reload_js_path)}
+  #{Application.compile_env(:fermo, :live_reload_js, "")}
   </script>
   """
 
