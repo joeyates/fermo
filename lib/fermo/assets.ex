@@ -58,9 +58,9 @@ defmodule Fermo.Assets do
 
   defp is_asset?(path) do
     with false <- File.dir?(path),
-         filename <- Path.basename(path),
+         filename = Path.basename(path),
          false <- Regex.match?(@digested_filename, filename),
-         extension <- Path.extname(path),
+         extension = Path.extname(path),
          true <- extension in @asset_extensions do
       true
     else
