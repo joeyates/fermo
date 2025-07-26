@@ -9,8 +9,8 @@ defmodule Fermo.Assets.ESBuild do
       {:ok}
     end
 
-    def output do
-      ~w(application.js)
+    def output() do
+      [~r{application(-\w+)?\.js}]
     end
   end
 end

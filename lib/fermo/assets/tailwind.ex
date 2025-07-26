@@ -6,8 +6,8 @@ defmodule Fermo.Assets.Tailwind do
       Tailwind.install_and_run(:default, [])
     end
 
-    def output do
-      ~w(app.css)
+    def output() do
+      [~r{app(-\w+)?\.css$}]
     end
   end
 end

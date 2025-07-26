@@ -78,13 +78,7 @@ defmodule Fermo.Live.App do
 
   defp asset_watchers do
     if Enum.any?(@assets) do
-      matches =
-        @assets
-        |> Enum.flat_map(& &1.output())
-        |> Enum.map(&Regex.escape/1)
-        |> Enum.join("|")
-
-      wanted = Regex.compile!("(#{matches})$")
+      wanted = Enum.flat_map(@assets, & &1.output())
 
       [
         [

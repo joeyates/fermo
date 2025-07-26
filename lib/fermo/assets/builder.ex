@@ -1,4 +1,7 @@
 defmodule Fermo.Assets.Builder do
   @callback build() :: {:ok}
-  @callback output() :: [String.t()]
+  @doc """
+  Returns a list of output file patterns that this builder generates.
+  """
+  @callback output() :: [Regex.t()]
 end

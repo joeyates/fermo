@@ -87,6 +87,17 @@ defmodule Fermo.Live.Watcher do
     :modified in events && :closed in events
   end
 
+  defp wanted?(path, %{wanted: wanted}) when is_list(wanted) do
+    Logger.debug("Checking if path matches any wanted patterns: #{path}, #{inspect(wanted)}")
+    wanted = Enum.any?(wanted, &String.match?(path, &1))
+
+    if wanted do
+      Logger.debug("Path '#{path}' matches one of the wanted patterns.")
+    end
+
+    wanted
+  end
+
   defp wanted?(path, %{wanted: wanted}) do
     String.match?(path, wanted)
   end
