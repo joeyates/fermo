@@ -82,7 +82,7 @@ defmodule Fermo.Live.App do
 
       [
         [
-          dir: "build",
+          dir: "build/assets",
           wanted: wanted,
           call: [
             {Fermo.Assets, :create_manifest, []},
