@@ -33,6 +33,7 @@ defmodule Fermo.Live.Watcher do
 
   @impl true
   def init(%{} = opts) do
+    Logger.debug("Fermo.Live.Watcher starting with options: #{inspect(opts)}")
     FileSystem.subscribe(opts.pid)
     {:ok, opts}
   end
@@ -99,8 +100,12 @@ defmodule Fermo.Live.Watcher do
   end
 
   defp wanted?(path, %{wanted: wanted}) do
+    Logger.debug("Checking if path matches wanted pattern: #{path}, #{inspect(wanted)}")
     String.match?(path, wanted)
   end
 
-  defp wanted?(_path, _state), do: true
+  defp wanted?(_path, _state) do
+    Logger.debug("No 'wanted' pattern specified, assuming all paths are wanted.")
+    true
+  end
 end

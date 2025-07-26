@@ -104,7 +104,7 @@ defmodule Fermo.Live.Dependencies do
 
     case app_module.config() do
       {:ok, config} ->
-        config_ms = Time.diff(t0, Time.utc_now(), :millisecond)
+        config_ms = Time.diff(Time.utc_now(), t0, :millisecond)
         Logger.debug("Config loaded in #{config_ms}ms")
         config
 
