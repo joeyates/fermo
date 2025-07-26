@@ -93,18 +93,29 @@ defmodule Fermo.Live.Dependencies do
   end
 
   defp load_config(app_module) do
+    app_module
+    |> fetch_config()
+    |> post_config()
+  end
+
+  defp fetch_config(app_module) do
     Logger.info("Requesting #{app_module}.config... ")
-    {:ok, config} = app_module.config()
-    Logger.info("Done!")
-    Logger.info("Running post config... ")
 
-    config =
-      config
-      |> @config.post_config()
-      |> set_live_attributes()
+    case app_module.config() do
+      {:ok, config} ->
+        config
 
-    Logger.info("Done!")
+      {:error, reason} ->
+        raise "Failed to fetch config: #{reason}"
+    end
+  end
+
+  defp post_config(config) do
+    Logger.debug("Running post config... ")
+
     config
+    |> @config.post_config()
+    |> set_live_attributes()
   end
 
   defp set_live_attributes(config) do
