@@ -36,7 +36,7 @@ defmodule Fermo.Assets do
   def create_manifest() do
     with {:ok, files} <- list_files(),
          {:ok, metadata} <- build_metadata(files),
-         {:ok} <- copy_to_digested(metadata),
+         {:ok} <- copy_new_digested(metadata),
          {:ok, manifest} <- to_manifest(metadata) do
       GenServer.call(@name, {:put, manifest})
       {:ok}
@@ -93,8 +93,9 @@ defmodule Fermo.Assets do
     {:ok, metadata}
   end
 
-  defp copy_to_digested(metadata) do
+  defp copy_new_digested(metadata) do
     metadata
+    |> Enum.filter(&(!File.regular?(&1.digested_filename)))
     |> Enum.each(fn item ->
       File.cp!(item.filename, item.digested_filename)
     end)
