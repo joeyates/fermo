@@ -100,9 +100,12 @@ defmodule Fermo.Live.Dependencies do
 
   defp fetch_config(app_module) do
     Logger.info("Requesting #{app_module}.config... ")
+    t0 = Time.utc_now()
 
     case app_module.config() do
       {:ok, config} ->
+        config_ms = Time.diff(t0, Time.utc_now(), :millisecond)
+        Logger.debug("Config loaded in #{config_ms}ms")
         config
 
       {:error, reason} ->
