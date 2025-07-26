@@ -16,7 +16,7 @@ defmodule Fermo.Live.App do
   @assets Application.compile_env(:fermo, :assets, [])
   @code_watchers [
     [dir: "lib", notify: ChangeHandler.Lib],
-    [dir: "priv/source", notify: ChangeHandler.Template]
+    [dir: "priv/source", notify: ChangeHandler.Template, wanted: ~r/(\.html\.slim)$/]
   ]
 
   def start(_type, _args) do
