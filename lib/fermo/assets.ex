@@ -69,28 +69,26 @@ defmodule Fermo.Assets do
   end
 
   defp build_metadata(files) do
-    metadata =
-      files
-      |> Enum.map(fn file ->
-        relative_filename = Path.relative_to(file, @asset_path)
-        content = File.read!(file)
-        digest = content |> :erlang.md5() |> Base.encode16(case: :lower)
-        extension = Path.extname(file)
-        root = Path.rootname(file, extension)
-        digested_filename = "#{root}-#{digest}#{extension}"
-        relative_digested_filename = Path.relative_to(digested_filename, @asset_path)
+    files
+    |> Enum.map(fn file ->
+      relative_filename = Path.relative_to(file, @asset_path)
+      content = File.read!(file)
+      digest = content |> :erlang.md5() |> Base.encode16(case: :lower)
+      extension = Path.extname(file)
+      root = Path.rootname(file, extension)
+      digested_filename = "#{root}-#{digest}#{extension}"
+      relative_digested_filename = Path.relative_to(digested_filename, @asset_path)
 
-        %{
-          filename: file,
-          relative_filename: relative_filename,
-          digest: digest,
-          digested_filename: digested_filename,
-          asset_path: "/#{relative_digested_filename}",
-          extension: extension
-        }
-      end)
-
-    {:ok, metadata}
+      %{
+        filename: file,
+        relative_filename: relative_filename,
+        digest: digest,
+        digested_filename: digested_filename,
+        asset_path: "/#{relative_digested_filename}",
+        extension: extension
+      }
+    end)
+    |> then(&{:ok, &1})
   end
 
   defp copy_new_digested(metadata) do
