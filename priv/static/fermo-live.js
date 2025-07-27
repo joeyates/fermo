@@ -1,9 +1,11 @@
 class FermoLiveSocket {
   PING_INTERVAL = 10000 // 10 seconds
+  ONE_SECOND = 1000
 
   constructor(location) {
     this.location = location
     this.pingTimer = null
+    this.reconnectTimer = null
     this.initializeWebSocket()
   }
 
@@ -23,6 +25,7 @@ class FermoLiveSocket {
 
     this.socket.onopen = e => {
       console.debug('fermo-live: socket onopen')
+      this.clearReconnectTimer()
       this.subscribe()
       this.startPing()
     }
@@ -40,9 +43,11 @@ class FermoLiveSocket {
       if (event.wasClean) {
         console.debug('fermo-live: onclose clean event:', event)
       } else {
-        // TODO: Poll to try to reconnect
         console.debug('fermo-live: onclose non-clean event:', event)
       }
+
+      this.socket = null
+      this.startReconnectTimer()
     }
 
     this.socket.onerror = error => {
@@ -66,6 +71,21 @@ class FermoLiveSocket {
     if (this.pingTimer) {
       window.clearInterval(this.pingTimer)
       this.pingTimer = null
+    }
+  }
+
+  startReconnectTimer() {
+    this.clearReconnectTimer()
+    this.reconnectTimer = window.setTimeout(() => {
+      console.debug('fermo-live: reconnecting...')
+      this.initializeWebSocket()
+    }, this.ONE_SECOND)
+  }
+
+  clearReconnectTimer() {
+    if (this.reconnectTimer) {
+      window.clearTimeout(this.reconnectTimer)
+      this.reconnectTimer = null
     }
   }
 
