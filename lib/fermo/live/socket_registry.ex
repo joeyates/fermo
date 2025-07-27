@@ -44,9 +44,17 @@ defmodule Fermo.Live.SocketRegistry do
   end
 
   def reload(path \\ nil) do
-    path
-    |> subscribed()
-    |> Enum.each(fn pid ->
+    message =
+      if is_nil(path) do
+        "Reloading all clients"
+      else
+        "Reloading clients for path: #{inspect(path)}"
+      end
+
+    subscribed_pids = subscribed(path)
+    Logger.debug("#{__MODULE__} #{message}. Client count: #{length(subscribed_pids)}")
+
+    Enum.each(subscribed_pids, fn pid ->
       send(pid, {:reload})
     end)
 
