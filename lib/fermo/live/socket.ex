@@ -24,9 +24,21 @@ defmodule Fermo.Live.Socket do
   end
 
   def websocket_handle({:text, "subscribe:live-reload:" <> path}, state) do
-    Fermo.Live.SocketRegistry.subscribe(path, self())
+    uri = URI.new!(path)
+    %{"generation" => client_generation} = URI.decode_query(uri.query)
+    {:ok, generation} = Dependencies.generation()
 
-    {:reply, {:text, "fermo:live-reload subscribed for '#{path}'"}, state}
+    if generation == client_generation do
+      Fermo.Live.SocketRegistry.subscribe(uri.path, self())
+
+      {:reply, {:text, "fermo:live-reload subscribed for '#{path}'"}, state}
+    else
+      Logger.debug(
+        "#{__MODULE__} Client generation #{client_generation} does not match server generation #{generation} - sending reload message"
+      )
+
+      {:reply, {:text, "reload"}, state}
+    end
   end
 
   def websocket_handle({:text, "rebuild:" <> path}, state) do
