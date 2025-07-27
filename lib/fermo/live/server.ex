@@ -27,7 +27,7 @@ defmodule Fermo.Live.Server do
   end
 
   defp handle_request_path({:ok, request_path}, conn) do
-    Logger.debug("[Fermo.Live.Server] GET #{request_path}")
+    Logger.debug("GET #{request_path}")
 
     if is_static?(request_path) do
       serve_static(request_path, conn)
