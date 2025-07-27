@@ -56,8 +56,9 @@ class FermoLiveSocket {
   }
 
   subscribe() {
-    console.debug('fermo-live: subscribe:live-reload:', this.location.pathname)
-    this.socket.send('subscribe:live-reload:' + this.location.pathname)
+    const message = `subscribe:live-reload:${this.location.pathname}?generation=${window.fermoDependenciesGeneration}`
+    console.debug(`fermo-live: ${message}`)
+    this.socket.send(message)
   }
 
   startPing() {
