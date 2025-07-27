@@ -7,7 +7,7 @@ defmodule Fermo.Assets.Tailwind do
     end
 
     def output() do
-      [~r{app(-\w+)?\.css$}]
+      [~r{app\.css$}]
     end
   end
 end

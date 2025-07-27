@@ -56,8 +56,9 @@ class FermoLiveSocket {
   }
 
   subscribe() {
-    console.debug('fermo-live: subscribe:live-reload:', this.location.pathname)
-    this.socket.send('subscribe:live-reload:' + this.location.pathname)
+    const message = `subscribe:live-reload:${this.location.pathname}?generation=${window.fermoDependenciesGeneration}`
+    console.debug(`fermo-live: ${message}`)
+    this.socket.send(message)
   }
 
   startPing() {
@@ -89,7 +90,6 @@ class FermoLiveSocket {
     }
   }
 
-  // Define property getter for socketPath
   get socketPath() {
     const protocol = this.location.protocol === 'https:' ? 'wss' : 'ws'
     return `${protocol}://${this.location.host}/__fermo/ws/live-reload`

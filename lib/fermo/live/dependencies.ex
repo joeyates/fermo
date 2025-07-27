@@ -14,7 +14,15 @@ defmodule Fermo.Live.Dependencies do
   def init(app_module: app_module) do
     {:ok} = @i18n.load()
     config = load_config(app_module)
-    {:ok, %{config: config, app_module: app_module}}
+    {:ok, %{config: config, app_module: app_module, generation: generation_string()}}
+  end
+
+  def generation() do
+    GenServer.call(__MODULE__, {:generation})
+  end
+
+  def increment_generation() do
+    GenServer.cast(__MODULE__, {:increment_generation})
   end
 
   def reinitialize() do
@@ -38,10 +46,19 @@ defmodule Fermo.Live.Dependencies do
   end
 
   @impl true
+  def handle_cast({:increment_generation}, state) do
+    {:noreply, %{state | generation: generation_string()}}
+  end
+
+  @impl true
   def handle_call({:reinitialize}, _from, %{app_module: app_module} = state) do
     Logger.debug("Reinitializing Fermo dependencies...")
     config = load_config(app_module)
-    {:reply, {:ok}, Map.put(state, :config, config)}
+    {:reply, {:ok}, %{state | config: config, generation: generation_string()}}
+  end
+
+  def handle_call({:generation}, _from, state) do
+    {:reply, {:ok, state.generation}, state}
   end
 
   def handle_call({:page_from_path, path}, _from, state) do
@@ -155,5 +172,9 @@ defmodule Fermo.Live.Dependencies do
       end)
 
     put_in(state, [:config, :pages], pages)
+  end
+
+  defp generation_string() do
+    Time.to_string(Time.utc_now())
   end
 end

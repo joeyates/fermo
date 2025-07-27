@@ -86,6 +86,7 @@ defmodule Fermo.Live.App do
           wanted: wanted,
           call: [
             {Fermo.Assets, :create_manifest, []},
+            {Fermo.Live.Dependencies, :increment_generation, []},
             {Fermo.Live.SocketRegistry, :reload, []}
           ]
         ]
