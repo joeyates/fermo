@@ -89,7 +89,6 @@ class FermoLiveSocket {
     }
   }
 
-  // Define property getter for socketPath
   get socketPath() {
     const protocol = this.location.protocol === 'https:' ? 'wss' : 'ws'
     return `${protocol}://${this.location.host}/__fermo/ws/live-reload`
