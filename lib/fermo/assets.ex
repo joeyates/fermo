@@ -6,6 +6,8 @@ defmodule Fermo.Assets do
 
   use GenServer
 
+  require Logger
+
   @asset_path Application.compile_env(
                 :fermo,
                 :asset_path,
@@ -32,6 +34,8 @@ defmodule Fermo.Assets do
   end
 
   def create_manifest() do
+    Logger.debug("#{__MODULE__} Creating asset manifest...")
+
     with {:ok, files} <- list_files(),
          {:ok, metadata} <- build_metadata(files),
          {:ok} <- copy_new_digested(metadata),

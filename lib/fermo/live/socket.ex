@@ -15,6 +15,7 @@ defmodule Fermo.Live.Socket do
   end
 
   def websocket_info({:reload}, state) do
+    Logger.debug("#{__MODULE__} Sending reload message to client")
     {:reply, {:text, "reload"}, state}
   end
 
@@ -29,7 +30,7 @@ defmodule Fermo.Live.Socket do
   end
 
   def websocket_handle({:text, "rebuild:" <> path}, state) do
-    Logger.debug("#{__MODULE__} - Handling rebuild request, path: #{path}")
+    Logger.debug("#{__MODULE__} Handling rebuild request, path: #{path}")
 
     response =
       case Fermo.Live.Dependencies.page_from_path(path) do

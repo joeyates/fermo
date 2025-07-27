@@ -1,6 +1,7 @@
 defmodule Fermo.Live.SocketRegistry do
   use GenServer
 
+  require Logger
 
   def init(_opts) do
     {:ok, %{}}
@@ -11,6 +12,7 @@ defmodule Fermo.Live.SocketRegistry do
   end
 
   def subscribe(path, pid) when is_pid(pid) do
+    Logger.debug("#{__MODULE__} subscribing #{inspect(pid)} to path: #{inspect(path)}")
     path = if String.ends_with?(path, "/"), do: path, else: path <> "/"
     GenServer.call(__MODULE__, {:subscribe, path, pid})
   end
