@@ -2,16 +2,15 @@ defmodule Fermo.Live.Server do
   import Plug.Conn
   import Mix.Fermo.Paths, only: [app_path: 0]
 
+  alias Fermo.Live.Dependencies
+
   require Logger
 
   live_reload_js_path = Application.app_dir(:fermo, "priv/static/fermo-live.js")
   @external_resource live_reload_js_path
-
   @live_reload_js """
-  <script type="text/javascript">
   #{File.read!(live_reload_js_path)}
   #{Application.compile_env(:fermo, :live_reload_js, "")}
-  </script>
   """
 
   def init(_options) do
@@ -79,9 +78,9 @@ defmodule Fermo.Live.Server do
   defp inject_reload(html) do
     if has_body_close?(html) do
       [body | tail] = String.split(html, "</body>")
-      Enum.join([body, @live_reload_js | tail], "\n")
+      Enum.join([body, live_reload_js() | tail], "\n")
     else
-      Enum.join([html, @live_reload_js], "\n")
+      Enum.join([html, live_reload_js()], "\n")
     end
   end
 
@@ -156,6 +155,18 @@ defmodule Fermo.Live.Server do
       true ->
         {:error, :unexpected_extname_result}
     end
+  end
+
+  defp live_reload_js() do
+    {:ok, generation} = Dependencies.generation()
+
+    """
+    <script type="text/javascript">
+    window.fermoDependenciesGeneration = '#{generation}'
+
+    #{@live_reload_js}
+    </script>
+    """
   end
 
   defp mime_type(extension) do
