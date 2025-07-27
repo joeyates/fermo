@@ -22,10 +22,8 @@ defmodule Fermo.Assets do
                      :live_asset_base,
                      "/"
                    )
-  @name :fermo_assets
-
   def start_link(args \\ %{}) do
-    GenServer.start_link(__MODULE__, args, name: @name)
+    GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
 
   @impl true
@@ -38,7 +36,7 @@ defmodule Fermo.Assets do
          {:ok, metadata} <- build_metadata(files),
          {:ok} <- copy_new_digested(metadata),
          {:ok, manifest} <- to_manifest(metadata) do
-      GenServer.call(@name, {:put, manifest})
+      GenServer.call(__MODULE__, {:put, manifest})
       {:ok}
     else
       {:error, reason} ->
@@ -113,15 +111,15 @@ defmodule Fermo.Assets do
   end
 
   def manifest do
-    GenServer.call(@name, {:manifest})
+    GenServer.call(__MODULE__, {:manifest})
   end
 
   def path("/" <> name) do
-    GenServer.call(@name, {:path, name})
+    GenServer.call(__MODULE__, {:path, name})
   end
 
   def path(name) do
-    GenServer.call(@name, {:path, name})
+    GenServer.call(__MODULE__, {:path, name})
   end
 
   def path!(name) do

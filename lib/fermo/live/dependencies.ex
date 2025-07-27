@@ -3,13 +3,11 @@ defmodule Fermo.Live.Dependencies do
 
   require Logger
 
-  @name :fermo_dependencies
-
   @config Application.compile_env(:fermo, :config, Fermo.Config)
   @i18n Application.compile_env(:fermo, :i18n, Fermo.I18n)
 
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: @name)
+    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
   @impl true
@@ -20,23 +18,23 @@ defmodule Fermo.Live.Dependencies do
   end
 
   def reinitialize() do
-    {:ok} = GenServer.call(@name, {:reinitialize})
+    {:ok} = GenServer.call(__MODULE__, {:reinitialize})
   end
 
   def page_from_path(path) do
-    GenServer.call(@name, {:page_from_path, path})
+    GenServer.call(__MODULE__, {:page_from_path, path})
   end
 
   def pages_by_dependency(value) do
-    GenServer.call(@name, {:pages_by_dependency, value})
+    GenServer.call(__MODULE__, {:pages_by_dependency, value})
   end
 
   def start_page(path) do
-    GenServer.call(@name, {:start_page, path})
+    GenServer.call(__MODULE__, {:start_page, path})
   end
 
   def add_page_dependency(path, value) do
-    GenServer.call(@name, {:add_page_dependency, path, value})
+    GenServer.call(__MODULE__, {:add_page_dependency, path, value})
   end
 
   @impl true

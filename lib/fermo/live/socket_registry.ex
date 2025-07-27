@@ -1,31 +1,30 @@
 defmodule Fermo.Live.SocketRegistry do
   use GenServer
 
-  @name :fermo_registry
 
   def init(_opts) do
     {:ok, %{}}
   end
 
   def start_link(_opts) do
-    GenServer.start_link(__MODULE__, nil, name: @name)
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
   def subscribe(path, pid) when is_pid(pid) do
     path = if String.ends_with?(path, "/"), do: path, else: path <> "/"
-    GenServer.call(@name, {:subscribe, path, pid})
+    GenServer.call(__MODULE__, {:subscribe, path, pid})
   end
 
   def unsubscribe(pid) do
-    GenServer.call(@name, {:unsubscribe, pid})
+    GenServer.call(__MODULE__, {:unsubscribe, pid})
   end
 
   def subscribed() do
-    GenServer.call(@name, {:subscribed})
+    GenServer.call(__MODULE__, {:subscribed})
   end
 
   def subscribed(nil) do
-    GenServer.call(@name, {:subscribed})
+    GenServer.call(__MODULE__, {:subscribed})
   end
 
   def subscribed(paths) when is_list(paths) do
@@ -35,11 +34,11 @@ defmodule Fermo.Live.SocketRegistry do
   end
 
   def subscribed(path) when is_binary(path) do
-    GenServer.call(@name, {:subscribed, path})
+    GenServer.call(__MODULE__, {:subscribed, path})
   end
 
   def subscribed(%Regex{} = path) do
-    GenServer.call(@name, {:subscribed, path})
+    GenServer.call(__MODULE__, {:subscribed, path})
   end
 
   def reload(path \\ nil) do
