@@ -14,7 +14,14 @@ defmodule Fermo.Live.Watcher do
   end
 
   def start_link(opts) do
-    start_opts = [dirs: [opts[:dir]]]
+    directory = opts[:dir] || raise "Directory option :dir is required for Fermo.Live.Watcher"
+
+    if !File.dir?(directory) do
+      Logger.warning("Directory '#{directory}' does not exist, creating it for live reload")
+      File.mkdir_p!(directory)
+    end
+
+    start_opts = [dirs: [directory]]
 
     case FileSystem.start_link(start_opts) do
       {:ok, pid} ->
